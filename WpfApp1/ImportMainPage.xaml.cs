@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -190,26 +191,26 @@ namespace WpfApp1
                 //todo
                 return true;
             }
-            private void check_if_csv(int fileIndex, Microsoft.Win32.OpenFileDialog dialog)
+            private void check_if_csv(int fileIndex,List<string> fileAddresses)
             {
-                string[] fileName = dialog.FileNames.ToList()[fileIndex].Split('\\');
+                string[] fileName = fileAddresses[fileIndex].Split('\\');
                 int lastPartIndex = fileName.Length - 1;
                 Regex csvPattern = new Regex(@".csv$");
                 if (csvPattern.IsMatch(fileName[lastPartIndex]))
                 {
-                    string newExcelPath = dialog.FileNames[fileIndex].Substring(0, dialog.FileNames[fileIndex].Length - 4);
-                    string csv = dialog.FileNames[fileIndex];
+                    string newExcelPath = fileAddresses[fileIndex].Substring(0, fileAddresses[fileIndex].Length - 4);
+                    string csv = fileAddresses[fileIndex];
                     string xls = newExcelPath + ".xls";
 
                     List<List<string>> allWords = new List<List<string>>();
-                    IEnumerable<String> all_lines = System.IO.File.ReadLines(dialog.FileNames[fileIndex], Encoding.Default);
+                    IEnumerable<String> all_lines = System.IO.File.ReadLines(fileAddresses[fileIndex], Encoding.Default);
                     foreach (var lines in all_lines)
                     {
                         List<string> words = lines.Split(';').ToList();
                         allWords.Add(words);
                     }
                     Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-                    Workbook wb = app.Workbooks.Open(dialog.FileNames[fileIndex], Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                    Workbook wb = app.Workbooks.Open(fileAddresses[fileIndex], Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                     Worksheet sheet = wb.Worksheets[1];
                     int row = 1;
                     foreach (List<string> lines in allWords)
@@ -225,7 +226,7 @@ namespace WpfApp1
                     wb.SaveAs(newExcelPath, XlFileFormat.xlOpenXMLWorkbook, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                     wb.Close();
                     app.Quit();
-                    dialog.FileNames[fileIndex] = newExcelPath; //overwriting the old string
+                    fileAddresses[fileIndex] = newExcelPath; //overwriting the old string
                 }
             }
             public void Execute(object parameter)
@@ -248,7 +249,7 @@ namespace WpfApp1
                         {
                             for (int i = 0; i < dlg.FileNames.ToList().Count; i++)
                             {
-                                check_if_csv(i,dlg);
+                                check_if_csv(i,dlg.FileNames.ToList());
                             }
                             //importPage.FolderAddressLabel.Content = dlg.FileName.;
                             if (messageBoxResult == MessageBoxResult.Yes)
@@ -282,7 +283,26 @@ namespace WpfApp1
             Nullable<bool> result = dlg.ShowDialog();
             if (result == true)
             {
-                new ImportReadIn("Stock", dlg.FileNames.ToList(), mainWindow, false);
+                /*
+                IEnumerable<String> all_lines = System.IO.File.ReadLines(dlg.FileNames.ToList()[0], Encoding.Default);
+                foreach (var lines in all_lines)
+                {
+                    string[] splittedLine=lines.Split(';');
+                    for(int i=0;i<splittedLine.Length;i++)
+                    {
+                        if(splittedLine[i]!="")
+                        {
+                        }
+                    }
+                }
+                //new ImportReadIn("Stock", dlg.FileNames.ToList(), mainWindow, false);
+                */
+                string csv;
+                using (var web = new WebClient())
+                {
+                    var url = $"http://www.nasdaq.com/screening/companies-by-industry.aspx?render=download";
+                    csv = web.DownloadString(url);
+                }
             }
         }
     }
