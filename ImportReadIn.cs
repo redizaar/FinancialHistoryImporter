@@ -56,7 +56,7 @@ namespace WpfApp1
                     else if(importType=="Stock")
                     {
                         TemplateStockReadIn templateStock = new TemplateStockReadIn(this,path[i]);
-                        templateStock.analyzeStockTransactionFile();
+                        //templateStock.analyzeStockTransactionFile();
                     }
                 }
                 excel.Application.Quit();

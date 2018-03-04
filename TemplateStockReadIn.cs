@@ -11,6 +11,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.IO;
 using System.Net;
+using System.Globalization;
 
 namespace WpfApp1
 {
@@ -22,7 +23,6 @@ namespace WpfApp1
         private Worksheet stockWorksheet;
         private _Application excel = new _Excel.Application();
         private string temporaryExcel="";
-        private bool isCSV;
         public TemplateStockReadIn(ImportReadIn _stockHandler,string filePath)
         {
             stockHandler = _stockHandler;
@@ -88,6 +88,23 @@ namespace WpfApp1
                 }
             }
             */
+            getCSVdataFromGoogle(companyToDate,companyToTicker);
+        }
+
+        private void getCSVdataFromGoogle(Dictionary<string, string> companyToDate, Dictionary<string, string> companyToTicker)
+        {
+            foreach(var cToTicker in companyToTicker)
+            {
+                foreach(var cToDate in companyToDate)
+                {
+                    if(cToTicker.Key==cToDate.Key)
+                    {
+                        string url = "https://finance.google.com/finance/historical?q=" + cToTicker.Value + "&startdate=" + cToDate.Value + "&output=csv";
+                        //now we have the oldest date from each ticker
+                        //we have to get the other dates to get the prices from the csv
+                    }
+                }
+            }
         }
 
         private Dictionary<string, string> collectOldestShareDates(List<string> companyNames,int companyColumn, int dateColumn)
@@ -107,7 +124,52 @@ namespace WpfApp1
                 }
                 row++;
             }
-            int lastRow = row-2;
+            for(int i=row-2;i>1;i--)
+            {
+                if(stockWorksheet.Cells[i,companyColumn].Value!=null)
+                {
+                    for(int j=0;j<companyNames.Count;j++)
+                    {
+                        if(stockWorksheet.Cells[i,companyColumn].Value.ToString()==companyNames[j])
+                        {
+                            //$"https://finance.google.com/finance/historical?q=AAPL&startdate=01-Jan-2016&output=csv";
+                            if (stockWorksheet.Cells[i, dateColumn].Value != null)
+                            {
+                                //in case of Márc,Áprl,Máj
+                                string dateCellValue = removeDiacritics(stockWorksheet.Cells[i, dateColumn].Value.Tostring());
+                                string month="";
+                                Regex dateRegex1 = new Regex(@"^20\d{2}.\s\d{2}.\s\d{2}");
+                                Regex dateRegex2 = new Regex(@"^20\d{2}.\d{2}.\d{2}");
+                                Regex dateRegex3 = new Regex(@"^\d{2}-[\u0000-\u00FF]{3}.-\d{4}$");
+                                Regex dateRegex4 = new Regex(@"^\d{2}-[\u0000-\u00FF]{4}.-\d{4}$");
+                                if (dateRegex3.IsMatch(dateCellValue) || dateRegex4.IsMatch(dateCellValue))
+                                {
+                                    switch (dateCellValue.Substring(3,3))
+                                    {
+                                        case "maj":
+                                            month = "may";
+                                            break;
+                                        case "okt":
+                                            month = "oct";
+                                            break;
+                                    }
+                                    StringBuilder sb = new StringBuilder(dateCellValue);
+                                    int idx = 3;
+                                    for(int k=0;k<month.Length;k++)
+                                    {
+                                        sb[idx] = month[k];
+                                        idx++;
+                                    }
+                                    dateCellValue = sb.ToString();
+                                }
+                                companyToOldestDate.Add(companyNames[j], dateCellValue);
+
+                            }
+                            companyNames.Remove(companyNames[j]);
+                        }
+                    }
+                }
+            }
             return companyToOldestDate;
         }
 
@@ -183,7 +245,7 @@ namespace WpfApp1
                         blank_cell_counter=0;
                         if (dateRegex1.IsMatch(stockWorksheet.Cells[row, column].Value.ToString()) ||
                             dateRegex2.IsMatch(stockWorksheet.Cells[row, column].Value.ToString()) ||
-                            dateRegex3.IsMatch(stockWorksheet.Cells[row, column].ToString()) ||
+                            dateRegex3.IsMatch(stockWorksheet.Cells[row, column].Value.ToString()) ||
                             dateRegex4.IsMatch(stockWorksheet.Cells[row, column].Value.ToString()) ||
                             dateRegex5.IsMatch(stockWorksheet.Cells[row, column].Value.ToString()) ||
                             dateRegex6.IsMatch(stockWorksheet.Cells[row, column].Value.ToString()) ||
@@ -292,7 +354,7 @@ namespace WpfApp1
                 File.Delete(temporaryExcel);
             }
         }
-        public string[] WriteSafeReadAllLines(String path)
+        public string[] WriteSafeReadAllLines(string path)
         {
             using (var csv = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var sr = new StreamReader(csv))
@@ -304,6 +366,22 @@ namespace WpfApp1
                 }
                 return file.ToArray();
             }
+        }
+        static string removeDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
         ~TemplateStockReadIn()
         {
