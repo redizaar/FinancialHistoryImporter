@@ -23,6 +23,7 @@ namespace WpfApp1
         private Worksheet stockWorksheet;
         private _Application excel = new _Excel.Application();
         private string temporaryExcel="";
+        private Dictionary<string, string> companyToCSV;
         public TemplateStockReadIn(ImportReadIn _stockHandler,string filePath)
         {
             stockHandler = _stockHandler;
@@ -32,9 +33,150 @@ namespace WpfApp1
         {
             workbook = excel.Workbooks.Open(folderAddresses);
             stockWorksheet = workbook.Worksheets[1];
-            int companyName = getCompanyColumn();
-            int transactionDate = getDateColumn();
-            getHistoricalStockPrice(companyName,transactionDate);
+            int companyNameColumn = getCompanyColumn();
+            int transactionDateColumn = getDateColumn();
+            getHistoricalStockPrice(companyNameColumn, transactionDateColumn);
+            int priceColumn=getPricesToDatesFromCSV(companyNameColumn,transactionDateColumn);
+            int quantityColumn = getQuantityColumn();
+        }
+
+        private int getQuantityColumn()
+        {
+            int blank_cell_counter = 0;
+            int row = 1;
+            int column = 1;
+            while (blank_cell_counter < 2)
+            {
+                if (stockWorksheet.Cells[row, column].Value != null)
+                {
+                    blank_cell_counter = 0;
+                }
+                else
+                {
+                    blank_cell_counter++;
+                }
+                column++;
+            }
+            return 0;
+        }
+
+        private int getPricesToDatesFromCSV(int companyNameColumn,int transactionDateColumn)
+        {
+            int blank_cell_counter = 0;
+            int row = 2;
+            string companyName;
+            string transactionDate;
+            while(blank_cell_counter<2)
+            {
+                if (stockWorksheet.Cells[row, companyNameColumn].Value != null && stockWorksheet.Cells[row, transactionDateColumn].Value)
+                {
+                    companyName = stockWorksheet.Cells[row, companyNameColumn].Value.ToString();
+                    transactionDate = stockWorksheet.Cells[row, transactionDateColumn].Value.ToString();
+                    foreach(var cToCSV in companyToCSV)
+                    {
+                        if(companyName==cToCSV.Key)
+                        {
+                            double dayHighest = 0;
+                            double dayLowest = 0;
+                            getDayHighAndDayLowPrice(cToCSV.Value,transactionDate,ref dayHighest,ref dayLowest);
+                            int blank_column_counter = 0;
+                            while(blank_column_counter<2)
+                            {
+                                int column = 1;
+                                if(stockWorksheet.Cells[row,column].Value!=null)
+                                {
+                                    blank_column_counter = 0;
+                                    try
+                                    {
+                                        string cellValue = stockWorksheet.Cells[row, column].Value.ToString();
+                                        cellValue.Replace(',', '.');
+                                        double transactionPrice = double.Parse(cellValue);
+                                        if(transactionPrice>= dayLowest && transactionPrice<=dayHighest)
+                                        {
+                                            return column;
+                                        }
+                                    }
+                                    catch(Exception e)
+                                    {
+
+                                    }
+                                }
+                                else
+                                {
+                                    blank_column_counter++;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    blank_cell_counter++;
+                }
+                row++;
+            }
+            return 0;
+        }
+        private void getDayHighAndDayLowPrice(string csvString,string transactionDate,ref double highPrice,ref double lowPrice)
+        {
+            string month = "";
+            Regex dateRegex1 = new Regex(@"^20\d{2}.\s\d{2}.\s\d{2}");
+            Regex dateRegex2 = new Regex(@"^20\d{2}.\d{2}.\d{2}");
+            Regex dateRegex3 = new Regex(@"^\d{2}-[\u0000-\u00FF]{3}.-\d{4}$");
+            Regex dateRegex4 = new Regex(@"^\d{2}-[\u0000-\u00FF]{4}.-\d{4}$");
+            if (dateRegex1.IsMatch(transactionDate))
+            {
+                string[] splitted = transactionDate.Split(' ');
+                string dateCellValueFormatted = "";
+                for (int k = 0; k < splitted.Length; k++)
+                {
+                    dateCellValueFormatted += splitted[k];
+                }
+                dateCellValueFormatted.Replace('.', '-');
+                //2018-02-28
+                transactionDate = convertDateToCompare(dateCellValueFormatted);
+            }
+            else if (dateRegex2.IsMatch(transactionDate))
+            {
+                //2018-02-28
+                transactionDate.Replace('.', '-');
+                transactionDate = convertDateToCompare(transactionDate);
+            }
+            else if (dateRegex3.IsMatch(transactionDate))
+            {
+                switch (transactionDate.Substring(3, 3))
+                {
+                    case "maj":
+                        month = "may";
+                        break;
+                    case "okt":
+                        month = "oct";
+                        break;
+                }
+                //05-may-2018
+                transactionDate.Replace(transactionDate.Substring(3, 3), month);
+            }
+            else if (dateRegex4.IsMatch(transactionDate))
+            {
+                //05-may-2018
+                transactionDate.Remove(6, 1);
+            }
+            string[] words = csvString.Split(',');
+            int j = 0;
+            string regex = "[0-9]{2}-[a-zA-Z]{3}-[0-9]{2}";
+            string regex2 = "[0-9]-[a-zA-Z]{3}-[0-9]{2}";
+            for (int i = 0; i < words.Length; i++)
+            {
+                if ((Regex.IsMatch(words[i], regex)) || (Regex.IsMatch(words[i], regex2)))
+                {
+                    string[] date = words[i].Split('\n');
+                    if(date[1]==transactionDate)
+                    {
+                        highPrice = double.Parse(words[i+2].Replace('.', ','));
+                        lowPrice = double.Parse(words[i+3].Replace('.', ','));
+                    }
+                }
+            }
         }
         //right know olny works for NASDAQ,NYSE
         private void getHistoricalStockPrice(int companyColumn, int dateColumn)
@@ -93,15 +235,22 @@ namespace WpfApp1
 
         private void getCSVdataFromGoogle(Dictionary<string, string> companyToDate, Dictionary<string, string> companyToTicker)
         {
+            companyToCSV = new Dictionary<string, string>();
             foreach(var cToTicker in companyToTicker)
             {
                 foreach(var cToDate in companyToDate)
                 {
                     if(cToTicker.Key==cToDate.Key)
                     {
-                        string url = "https://finance.google.com/finance/historical?q=" + cToTicker.Value + "&startdate=" + cToDate.Value + "&output=csv";
-                        //now we have the oldest date from each ticker
-                        //we have to get the other dates to get the prices from the csv
+                        string csv;
+                        using (var web = new WebClient())
+                        {
+                            string url = "https://finance.google.com/finance/historical?q=" + cToTicker.Value + "&startdate=" + cToDate.Value + "&output=csv";
+                            //$"https://finance.google.com/finance/historical?q=AAPL&startdate=01-Jan-2016&output=csv";
+                            csv = web.DownloadString(url);
+                            string companyName = cToTicker.Key;
+                            companyToCSV.Add(companyName, csv);
+                        }
                     }
                 }
             }
@@ -126,51 +275,134 @@ namespace WpfApp1
             }
             for(int i=row-2;i>1;i--)
             {
-                if(stockWorksheet.Cells[i,companyColumn].Value!=null)
+                if (companyNames.Count == 0)
                 {
-                    for(int j=0;j<companyNames.Count;j++)
+                    //ha elfogyott a "begyűjtendő" cégnevek száma (megvan az összeshez a legrégebbi dátum)
+                    break;
+                }
+                else
+                {
+                    if (stockWorksheet.Cells[i, companyColumn].Value != null)
                     {
-                        if(stockWorksheet.Cells[i,companyColumn].Value.ToString()==companyNames[j])
+                        for (int j = 0; j < companyNames.Count; j++)
                         {
-                            //$"https://finance.google.com/finance/historical?q=AAPL&startdate=01-Jan-2016&output=csv";
-                            if (stockWorksheet.Cells[i, dateColumn].Value != null)
+                            if (stockWorksheet.Cells[i, companyColumn].Value.ToString() == companyNames[j])
                             {
-                                //in case of Márc,Áprl,Máj
-                                string dateCellValue = removeDiacritics(stockWorksheet.Cells[i, dateColumn].Value.Tostring());
-                                string month="";
-                                Regex dateRegex1 = new Regex(@"^20\d{2}.\s\d{2}.\s\d{2}");
-                                Regex dateRegex2 = new Regex(@"^20\d{2}.\d{2}.\d{2}");
-                                Regex dateRegex3 = new Regex(@"^\d{2}-[\u0000-\u00FF]{3}.-\d{4}$");
-                                Regex dateRegex4 = new Regex(@"^\d{2}-[\u0000-\u00FF]{4}.-\d{4}$");
-                                if (dateRegex3.IsMatch(dateCellValue) || dateRegex4.IsMatch(dateCellValue))
+                                //$"https://finance.google.com/finance/historical?q=AAPL&startdate=01-Jan-2016&output=csv"; 2016 január 1
+                                //$"https://finance.google.com/finance/historical?q=AAPL&startdate=10-02-2016&output=csv"; 2016 october 10
+                                if (stockWorksheet.Cells[i, dateColumn].Value != null)
                                 {
-                                    switch (dateCellValue.Substring(3,3))
+                                    //in case of Márc,Áprl,Máj
+                                    string dateCellValue = removeDiacritics(stockWorksheet.Cells[i, dateColumn].Value.Tostring());
+                                    string month = "";
+                                    Regex dateRegex1 = new Regex(@"^20\d{2}.\s\d{2}.\s\d{2}");
+                                    Regex dateRegex2 = new Regex(@"^20\d{2}.\d{2}.\d{2}");
+                                    Regex dateRegex3 = new Regex(@"^\d{2}-[\u0000-\u00FF]{3}.-\d{4}$");
+                                    Regex dateRegex4 = new Regex(@"^\d{2}-[\u0000-\u00FF]{4}.-\d{4}$");
+                                    if (dateRegex1.IsMatch(dateCellValue))
                                     {
-                                        case "maj":
-                                            month = "may";
-                                            break;
-                                        case "okt":
-                                            month = "oct";
-                                            break;
+                                        string[] splitted = dateCellValue.Split(' ');
+                                        string dateCellValueFormatted = "";
+                                        for (int k = 0; k < splitted.Length; k++)
+                                        {
+                                            dateCellValueFormatted += splitted[k];
+                                        }
+                                        dateCellValueFormatted.Replace('.', '-');
+                                        //2018-02-28
+                                        dateCellValue = dateCellValueFormatted;
                                     }
-                                    StringBuilder sb = new StringBuilder(dateCellValue);
-                                    int idx = 3;
-                                    for(int k=0;k<month.Length;k++)
+                                    else if (dateRegex2.IsMatch(dateCellValue))
                                     {
-                                        sb[idx] = month[k];
-                                        idx++;
+                                        //2018-02-28
+                                        dateCellValue.Replace('.', '-');
                                     }
-                                    dateCellValue = sb.ToString();
-                                }
-                                companyToOldestDate.Add(companyNames[j], dateCellValue);
+                                    else if (dateRegex3.IsMatch(dateCellValue))
+                                    {
+                                        switch (dateCellValue.Substring(3, 3))
+                                        {
+                                            case "maj":
+                                                month = "may";
+                                                break;
+                                            case "okt":
+                                                month = "oct";
+                                                break;
+                                        }
+                                        //05-may-2018
+                                        dateCellValue.Replace(dateCellValue.Substring(3, 3), month);
+                                        /*
+                                        StringBuilder sb = new StringBuilder(dateCellValue);
+                                        int idx = 3;
+                                        for(int k=0;k<month.Length;k++)
+                                        {
+                                            sb[idx] = month[k];
+                                            idx++;
+                                        }
+                                        dateCellValue = sb.ToString();
+                                        */
+                                    }
+                                    else if (dateRegex4.IsMatch(dateCellValue))
+                                    {
+                                        //05-may-2018
+                                        dateCellValue.Remove(6, 1);
+                                    }
+                                    companyToOldestDate.Add(companyNames[j], dateCellValue);
 
+                                }
+                                companyNames.Remove(companyNames[j]);
                             }
-                            companyNames.Remove(companyNames[j]);
                         }
                     }
                 }
             }
             return companyToOldestDate;
+        }
+
+        private string convertDateToCompare(string dateCellValueFormatted)
+        {
+            string CSVform = "";
+            string[] splitted = dateCellValueFormatted.Split('-');
+            CSVform = splitted[2] + "-";
+            switch (splitted[1])
+            {
+                case "01":
+                    CSVform += "Jan";
+                    break;
+                case "02":
+                    CSVform += "Feb";
+                    break;
+                case "03":
+                    CSVform += "Mar";
+                    break;
+                case "04":
+                    CSVform += "Apr";
+                    break;
+                case "05":
+                    CSVform += "May";
+                    break;
+                case "06":
+                    CSVform += "Jun";
+                    break;
+                case "07":
+                    CSVform += "Jul";
+                    break;
+                case "08":
+                    CSVform += "Aug";
+                    break;
+                case "09":
+                    CSVform += "Sep";
+                    break;
+                case "10":
+                    CSVform += "Oct";
+                    break;
+                case "11":
+                    CSVform += "Nov";
+                    break;
+                case "12":
+                    CSVform += "Dec";
+                    break;
+            }
+            CSVform += "-" + splitted[0];
+            return CSVform;
         }
 
         public static int levenshteinDistance(string s, string t)
@@ -391,8 +623,8 @@ namespace WpfApp1
                 deleteTemporaryExcel();
             }
             */
-            //workbook.Close();
-            //excel.Quit();
+            workbook.Close();
+            excel.Quit();
         }
     }
 }
