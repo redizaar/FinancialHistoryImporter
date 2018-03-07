@@ -25,11 +25,12 @@ namespace WpfApp1
         private string temporaryExcel="";
         private Dictionary<string, string> companyToCSV;
         private Dictionary<string, string> companyToTicker;
+        private List<Stock> importedStocks;
         private int companyNameColumn;
         private int transactionDateColumn;
         private int priceColumn;
         private int quantityColumn;
-        private int transactionType;
+        private int transactionTypeColumn;
         public TemplateStockReadIn(ImportReadIn _stockHandler,string filePath)
         {
             stockHandler = _stockHandler;
@@ -44,7 +45,7 @@ namespace WpfApp1
             getHistoricalStockPrice(companyNameColumn, transactionDateColumn);
             priceColumn=getPricesToDatesFromCSV(companyNameColumn,transactionDateColumn);
             quantityColumn = getQuantityColumn();
-            transactionType = getTransactionType();
+            transactionTypeColumn = getTransactionType();
         }
 
         private int getTransactionType()
@@ -123,9 +124,58 @@ namespace WpfApp1
             return 0;
         }
 
-        public void readOutTransactions(Dictionary<string,string> _companyToTicker)
+        public void readOutTransactions()
         {
-            
+            importedStocks = new List<Stock>();
+            int blank_cell_counter = 0;
+            int row = 2;
+            while(blank_cell_counter<2)
+            {
+                if((stockWorksheet.Cells[row,companyNameColumn].Value!=null) && 
+                        (stockWorksheet.Cells[row,transactionDateColumn].Value!=null) &&
+                        (stockWorksheet.Cells[row,priceColumn].Value!=null))
+                {
+                    blank_cell_counter = 0;
+
+                    string companyName = stockWorksheet.Cells[row, companyNameColumn].Value.ToString();
+                    string transactionDate = stockWorksheet.Cells[row, transactionDateColumn].Value.ToString();
+                    string transactionPriceString = stockWorksheet.Cells[row, priceColumn].Value.ToString();
+                    double transactionPrice = 0;
+                    try
+                    {
+                        transactionPrice = double.Parse(transactionPriceString);
+                    }
+                    catch(Exception e)
+                    {
+
+                    }
+                    string transactionType="-";
+                    string quantityString="";
+                    int quantity=0;
+                    if(stockWorksheet.Cells[row,transactionTypeColumn].Value!=null)
+                    {
+                        transactionType = stockWorksheet.Cells[row, transactionTypeColumn].Value.ToString();
+                    }
+                    if(stockWorksheet.Cells[row,quantityColumn].Value!=null)
+                    {
+                        quantityString = stockWorksheet.Cells[row, quantityColumn].Value.ToString();
+                        try
+                        {
+                            quantity = int.Parse(quantityString);
+                        }
+                        catch(Exception e)
+                        {
+
+                        }
+                    }
+                    Stock stock = new Stock(companyName, transactionPrice, quantity, transactionDate, transactionType);
+                    importedStocks.Add(stock);
+                }
+                else
+                {
+                    blank_cell_counter++;
+                }
+            }
         }
 
         private int getPricesToDatesFromCSV(int companyNameColumn,int transactionDateColumn)

@@ -8,15 +8,28 @@ namespace WpfApp1
 {
     class Stock
     {
-        /*
-        private string stockName;
-        private double stockPrice;
-        private string StockTimeID;
-        public Stock(string name,float price,string time_id)
+        public string stockName { get; private set; }
+        public double stockPrice { get; private set; }
+        public int quantity { get; private set; }
+        public string transactionDate { get; private set; }
+        public string transactionType { get; private set; }
+        public string writeDate { get; private set; }
+        public Stock(string _stockName,double _stockPrice,int _quantity,string _transactionDate,string _transactionType)
         {
-            stockName = name;
-            stockPrice = price;
-            StockTimeID = time_id;
+            stockName = _stockName;
+            stockPrice = _stockPrice;
+            quantity = _quantity;
+            transactionDate = _transactionDate;
+            transactionType = _transactionType;
+        }
+        public Stock(string _writeDate, string _stockName, double _stockPrice, int _quantity, string _transactionDate, string _transactionType)
+        {
+            writeDate = _writeDate;
+            stockName = _stockName;
+            stockPrice = _stockPrice;
+            quantity = _quantity;
+            transactionDate = _transactionDate;
+            transactionType = _transactionType;
         }
         public Stock(string name,float price)
         {
@@ -31,6 +44,17 @@ namespace WpfApp1
         {
             return stockPrice;
         }
-        */
+        public string getTransactionDate()
+        {
+            return transactionDate;
+        }
+        public string getTransactionType()
+        {
+            return transactionType;
+        }
+        public int getQuantity()
+        {
+            return quantity;
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace WpfApp1
                     {
                         TemplateStockReadIn templateStock = new TemplateStockReadIn(this,path[i]);
                         templateStock.analyzeStockTransactionFile();
-                        //templateStock.readOutTransactions(templateStock.getCompanyToTickerMap());
+                        templateStock.readOutTransactions();
                     }
                 }
                 excel.Application.Quit();
