@@ -7,8 +7,8 @@
       mc:Ignorable="d" 
       d:DesignHeight="305" d:DesignWidth="750"
       Title="TransactionMain">
-    <Grid Height="305" Width="750" VerticalAlignment="Top" Background="#ECECEA">
-        <DataGrid Name="TransactionTableXAML" AutoGenerateColumns="False" Margin="0,31,118,23" Width="auto">
+    <Grid Height="auto" Width="auto" Background="#ECECEA">
+        <DataGrid Name="TransactionTableXAML" HorizontalAlignment="Left" VerticalAlignment="Top">
             <DataGrid.Resources>
                 <Style TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -47,8 +47,9 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header=" Date of Transaction" Width="auto" Binding="{Binding transactionDate}"/>
                 <DataGridTextColumn Header=" Description" Width="auto" Binding="{Binding transactionDescription}"/>
-                <DataGridTextColumn Header=" Amount(HUF)" Width="auto" Binding="{Binding transactionPrice}"/>
+                <DataGridTextColumn Header=" Amount(HUF)"  Width="auto" Binding="{Binding transactionPrice}"/>
                 <DataGridTextColumn Header=" Date of Import" Width="auto" Binding="{Binding writeDate}"/>
+                <DataGridTextColumn Header=" Account number" Width="*" Binding="{Binding accountNumber}"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

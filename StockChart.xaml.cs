@@ -52,8 +52,8 @@ namespace WpfApp1
         public void getNewStockData()
         {
             WebStockData refreshStockData = new WebStockData();
-            refreshStockData.GetDataFromWeb();
-            refreshStockData.writeStocksToSQL();
+            //refreshStockData.GetDataFromWeb();
+            //refreshStockData.writeStocksToSQL();
         }
         //not in use
         public void refreshChartAttributes()

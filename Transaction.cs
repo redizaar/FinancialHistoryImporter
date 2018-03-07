@@ -12,7 +12,7 @@ namespace WpfApp1
         public string transactionDescription { get; set; }
         public string transactionDate { get; set; }
         public int transactionPrice { get; set; }
-        private string accountNumber;
+        public string accountNumber { get; set; }
         public string writeDate { get; set; }
         private string noBalance;
 

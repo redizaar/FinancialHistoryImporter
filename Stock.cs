@@ -8,8 +8,9 @@ namespace WpfApp1
 {
     class Stock
     {
+        /*
         private string stockName;
-        private float stockPrice;
+        private double stockPrice;
         private string StockTimeID;
         public Stock(string name,float price,string time_id)
         {
@@ -26,9 +27,10 @@ namespace WpfApp1
         {
             return stockName;
         }
-        public float getStockPrice()
+        public double getStockPrice()
         {
             return stockPrice;
         }
+        */
     }
 }

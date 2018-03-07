@@ -60,6 +60,7 @@ namespace WpfApp1
             sqlThread.Start();
             sqlThread.Join();
         }
+        /*
         public void GetDataFromWeb()
         {
             Stock stock;
@@ -90,6 +91,7 @@ namespace WpfApp1
                 //Console.WriteLine($"{ticker} : {price}");
             }
         }
+        */
         private void writeStocksToSQL(string ticker,List<string> new_dates,List<double> new_prices)
         {
             //elől vannak a friss dátumok, árak
@@ -151,6 +153,7 @@ namespace WpfApp1
                 }
             }
         }
+        /*
         public bool writeStocksToSQL()
         {
             //https://stackoverflow.com/questions/41161104/error-converting-data-type-varchar-to-float-c-sharp-webservice
@@ -170,6 +173,7 @@ namespace WpfApp1
             }
             return true;
         }
+        */
         public List<double> getPrices()
         {
             return prices;

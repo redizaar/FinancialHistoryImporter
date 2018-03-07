@@ -270,7 +270,12 @@ namespace WpfApp1
                             string accountNumber = getAccountNumber();
                             string transactionPriceString = TransactionSheet.Cells[row, singlepriceColumn].Value.ToString();
                             string transactionBalanceString = TransactionSheet.Cells[row, balaceColumn].Value.ToString();
-                            string transactionDescription = TransactionSheet.Cells[row, descriptionColumn].Value.ToString();
+
+                            string transactionDescription = "-";
+                            if(TransactionSheet.Cells[row, descriptionColumn].Value!=null)
+                            {
+                                transactionDescription = TransactionSheet.Cells[row, descriptionColumn].Value.ToString(); 
+                            }
 
                             int transactionPrice = 0;
                             int transactionBalance = 0;
@@ -299,7 +304,11 @@ namespace WpfApp1
                             string transactionDate = TransactionSheet.Cells[row, dateColumn].Value.ToString();
                             string accountNumber = getAccountNumber();
                             string transactionPriceString = TransactionSheet.Cells[row, singlepriceColumn].Value.ToString();
-                            string transactionDescription = TransactionSheet.Cells[row, descriptionColumn].Value.ToString();
+                            string transactionDescription="-";
+                            if (TransactionSheet.Cells[row, descriptionColumn].Value != null)
+                            {
+                                transactionDescription = TransactionSheet.Cells[row, descriptionColumn].Value.ToString();
+                            }
                             int transactionPrice = 0;
                             try
                             {
