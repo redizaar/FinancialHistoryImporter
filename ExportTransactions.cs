@@ -153,30 +153,6 @@ namespace WpfApp1
                         }
                     }
                     logFile.Close();
-                    /*
-                    if(neededTransactions.Count==0)
-                    {
-                        //mainWindow.setTableAttributes(savedTransactions, importerAccountNumber);
-                        //only pass the saved transactions because we didn't add new
-                        //and the accountNumber so we can select it by user
-                    }
-                    else
-                    {
-                        //we pass both the saved and the new transcations
-                        List<Transaction> savedAndImported=new List<Transaction>();
-
-                        //tempTrancations containts saved Transactions where the accountnumber matches with the imported Transactions
-                        foreach (var attribue in tempTransactions)
-                        {
-                            savedAndImported.Add(attribue);
-                        }
-                        foreach (var attribue in neededTransactions)
-                        {
-                            savedAndImported.Add(attribue);
-                        }
-                        //mainWindow.setTableAttributes(savedAndImported,true);
-                    }
-                    */
                     if (MessageBox.Show("You have imported "+neededTransactions.Count+" new transaction(s)!\n" +
                         "("+(tempTransactions.Count-explicitImported)+" was already imported)", "Import alert!",
                          MessageBoxButton.OK, MessageBoxImage.Information) == MessageBoxResult.OK)
@@ -256,6 +232,10 @@ namespace WpfApp1
                     sqlConn.Close();
                 }
             }
+        }
+        public ExportTransactions(List<Transaction> transactions, MainWindow mainWindow,string currentFileName)
+        {
+
         }
         public string geImporterAccountNumber()
         {

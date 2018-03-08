@@ -61,6 +61,8 @@ namespace WpfApp1
             sqlThread.Join();
         }
         /*
+         * getting price right now
+         * not historical
         public void GetDataFromWeb()
         {
             Stock stock;
@@ -154,6 +156,7 @@ namespace WpfApp1
             }
         }
         /*
+         * saving the single price (non historical to the sql database)
         public bool writeStocksToSQL()
         {
             //https://stackoverflow.com/questions/41161104/error-converting-data-type-varchar-to-float-c-sharp-webservice

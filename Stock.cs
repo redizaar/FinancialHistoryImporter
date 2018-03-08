@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WpfApp1
 {
-    class Stock
+    public class Stock
     {
         public string stockName { get; private set; }
         public double stockPrice { get; private set; }

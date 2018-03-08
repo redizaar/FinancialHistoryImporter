@@ -61,6 +61,7 @@ namespace WpfApp1
             int column = 1;
             while (row <= 4)
             {
+                column=1;
                 blank_cell_counter = 0;
                 while (blank_cell_counter < 2)
                 {
@@ -136,14 +137,13 @@ namespace WpfApp1
                         (stockWorksheet.Cells[row,priceColumn].Value!=null))
                 {
                     blank_cell_counter = 0;
-
                     string companyName = stockWorksheet.Cells[row, companyNameColumn].Value.ToString();
                     string transactionDate = stockWorksheet.Cells[row, transactionDateColumn].Value.ToString();
-                    string transactionPriceString = stockWorksheet.Cells[row, priceColumn].Value.ToString();
+                    string transactionPriceString = stockWorksheet.Cells[row, priceColumn].Value.ToString().Replace(',','.');
                     double transactionPrice = 0;
                     try
                     {
-                        transactionPrice = double.Parse(transactionPriceString);
+                        transactionPrice = double.Parse(transactionPriceString, CultureInfo.InvariantCulture);
                     }
                     catch(Exception e)
                     {
@@ -175,6 +175,7 @@ namespace WpfApp1
                 {
                     blank_cell_counter++;
                 }
+                row++;
             }
         }
 
@@ -196,8 +197,7 @@ namespace WpfApp1
                         {
                             double dayHighest = 0;
                             double dayLowest = 0;
-                            getDayHighAndDayLowPrice(cToCSV.Value,transactionDate,ref dayHighest,ref dayLowest);
-                            Console.WriteLine("Highest: " + dayHighest + " Lowest: " + dayLowest);
+                            getDayHighAndDayLowPrice(cToCSV.Value, transactionDate, ref dayHighest, ref dayLowest);
                             int blank_column_counter = 0;
                             //we go through the columns
                             int column = 1;
@@ -208,9 +208,10 @@ namespace WpfApp1
                                     blank_column_counter = 0;
                                     try
                                     {
-                                        string cellValue = stockWorksheet.Cells[row, column].Value.ToString();
-                                        double transactionPrice = double.Parse(cellValue.Replace('.', ','));
-                                        if(transactionPrice>= dayLowest && transactionPrice<=dayHighest)
+                                        string cellValue = stockWorksheet.Cells[row, column].Value.ToString().Replace(',','.');
+                                        double transactionPrice = double.Parse(cellValue, CultureInfo.InvariantCulture);
+                                        if((transactionPrice>= dayLowest && transactionPrice<=dayHighest) ||
+                                                (transactionPrice>=(dayLowest-(dayLowest*0.03)) && (transactionPrice<=(dayHighest*1.03))))
                                         {
                                             return column;
                                         }
@@ -319,8 +320,6 @@ namespace WpfApp1
                     {
                         highPrice = double.Parse(words[i+2].Replace('.', ','));
                         lowPrice = double.Parse(words[i+3].Replace('.', ','));
-                        Console.WriteLine(highPrice);
-                        Console.WriteLine(lowPrice);
                     }
                 }
             }

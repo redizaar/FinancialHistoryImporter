@@ -13,8 +13,8 @@ namespace WpfApp1
         private string importType = "";
         private string currentFileName;
         private MainWindow mainWindow;
-        List<Transaction> transactions;
-
+        private List<Transaction> bankTransactions;
+        private List<Stock> stockTransactions;
         _Application excel = new _Excel.Application();
         Workbook ReadWorkbook;
         Worksheet ReadWorksheet;
@@ -30,10 +30,10 @@ namespace WpfApp1
                     string [] splittedFileName=path[i].Split('\\');
                     int lastSplitIndex = splittedFileName.Length-1;
                     currentFileName = splittedFileName[lastSplitIndex];
-                    ReadWorkbook = excel.Workbooks.Open(path[i]);
-                    ReadWorksheet = ReadWorkbook.Worksheets[1];
                     if (importType=="Bank")
                     {
+                        ReadWorkbook = excel.Workbooks.Open(path[i]);
+                        ReadWorksheet = ReadWorkbook.Worksheets[1];
                         if (!specifiedByUser)
                         {
                             TemplateBankReadIn templateBank = new TemplateBankReadIn(this, ReadWorkbook, ReadWorksheet, mainWindow, false);
@@ -71,12 +71,23 @@ namespace WpfApp1
         }
         public void addTransactions(List<Transaction> newTransactions)
         {
-            this.transactions = newTransactions;
-            writeOutTransactions();
+            bankTransactions = newTransactions;
+            writeOutBankTransactions();
         }
-        public void writeOutTransactions()
+        public void addTransactions(List<Stock> newTransactions)
         {
-            new ExportTransactions(transactions,mainWindow,currentFileName);
+            stockTransactions = newTransactions;
+            writeOutStockTransactions();
+        }
+
+        private void writeOutStockTransactions()
+        {
+            
+        }
+
+        public void writeOutBankTransactions()
+        {
+            new ExportTransactions(bankTransactions,mainWindow,currentFileName);
         }
     }
 }
