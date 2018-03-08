@@ -33,7 +33,7 @@ namespace WpfApp1
             {
                 TransactionTableXAML.Items.Clear();
             }
-            List<Transaction> _tableAttribues = SavedTransactions.getSavedTransactions();
+            List<Transaction> _tableAttribues = SavedTransactions.getSavedTransactionsBank();
             if (_tableAttribues != null)
             {
                 tableAttributes = _tableAttribues;

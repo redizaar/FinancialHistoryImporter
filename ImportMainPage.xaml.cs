@@ -91,7 +91,7 @@ namespace WpfApp1
             string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
             DateTime todayDate = Convert.ToDateTime(todaysDate);
             usernameLabel.Content = currentUser.getUsername();
-            foreach (var transactions in SavedTransactions.getSavedTransactions())
+            foreach (var transactions in SavedTransactions.getSavedTransactionsBank())
             {
                 if(transactions.getAccountNumber().Equals(currentUser.getAccountNumber()))
                 {

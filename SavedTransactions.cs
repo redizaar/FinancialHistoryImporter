@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
+using System.Globalization;
 
 namespace WpfApp1
 {
@@ -19,12 +20,15 @@ namespace WpfApp1
         {
             savedTransactions = new List<Transaction>();
             ReadWorkbook = excel.Workbooks.Open(@"C:\Users\Tocki\Desktop\Kimutatas.xlsx");
+        }
+        public void readOutSavedBankTransactions()
+        {
             ReadWorksheet = ReadWorkbook.Worksheets[1];
             int i = 2;
-            while(ReadWorksheet.Cells[i,1].Value!=null)
+            while (ReadWorksheet.Cells[i, 1].Value != null)
             {
-                string writeoutDate="";
-                string transactionDate="";
+                string writeoutDate = "";
+                string transactionDate = "";
                 string balanceString = "";
                 int balance = 0;
                 string transactionPriceString = "";
@@ -36,33 +40,75 @@ namespace WpfApp1
                 transactionDate = ReadWorksheet.Cells[i, 2].Value.ToString();
                 balanceString = ReadWorksheet.Cells[i, 3].Value.ToString();
                 balance = int.Parse(balanceString);
-                if(ReadWorksheet.Cells[i,7].Value!=null)
+                if (ReadWorksheet.Cells[i, 7].Value != null)
                 {
                     transactionPriceString = ReadWorksheet.Cells[i, 7].Value.ToString();
                     transactionPrice = int.Parse(transactionPriceString);
                 }
-                else if(ReadWorksheet.Cells[i,9].Value!=null)
+                else if (ReadWorksheet.Cells[i, 9].Value != null)
                 {
                     transactionPriceString = ReadWorksheet.Cells[i, 9].Value.ToString();
                     transactionPrice = int.Parse(transactionPriceString);
                 }
                 accountNumber = ReadWorksheet.Cells[i, 16].Value.ToString();
-                if(ReadWorksheet.Cells[i, 14].Value!=null)
+                if (ReadWorksheet.Cells[i, 14].Value != null)
                 {
                     description = ReadWorksheet.Cells[i, 14].Value.ToString();
                 }
 
-                savedTransactions.Add(new Transaction(writeoutDate,transactionDate,balance,transactionPrice,accountNumber,description));
+                savedTransactions.Add(new Transaction(writeoutDate, transactionDate, balance, transactionPrice, accountNumber, description));
                 i++;
             }
-            excel.Workbooks.Close();
-            excel.Quit();
+            //excel.Workbooks.Close(); hiába csinálom ezeket mert úgy is singleton, akkor fog megsemmisülni amikor a program leáll
+            //excel.Quit();            főleg úgy hogy most 2 függvény van
         }
-        public static List<Transaction> getSavedTransactions()
+        public void readOutStockSavedTransactions()
+        {
+            ReadWorksheet = ReadWorkbook.Worksheets[2];
+            int i = 2;
+            while (ReadWorksheet.Cells[i, 1].Value != null)
+            {
+                string writeoutDate = "";
+                string stockName = "";
+                string transactionDate = "";
+                string stockPriceString = "";
+                double stockPrice = 0;
+                int quantity = 0;
+                string transactionType = "";
+                string importer = "";
+
+                writeoutDate = ReadWorksheet.Cells[i, 1].Value.ToString();
+                transactionDate = ReadWorksheet.Cells[i, 2].Value.ToString();
+                stockName = ReadWorksheet.Cells[i, 3].Value.ToString();
+                string quantityString="";
+
+                stockPriceString = ReadWorksheet.Cells[i, 4].Value.ToString().Replace(',','.');
+                stockPrice = double.Parse(stockPriceString, CultureInfo.InvariantCulture);
+                if(ReadWorksheet.Cells[i,5].Value!=null)//eladott
+                {
+                    quantityString = ReadWorksheet.Cells[i, 4].Value.ToString();
+                    quantity=int.Parse(quantityString)*(-1);
+                    transactionType = "Sell";
+                }
+                else if(ReadWorksheet.Cells[i,6].Value!=null)//vásárolt
+                {
+                    quantityString = ReadWorksheet.Cells[i, 5].Value.ToString();
+                    quantity = int.Parse(quantityString);
+                    transactionType = "Buy";
+                }
+                if(ReadWorksheet.Cells[i,11].Value!=null)
+                {
+                    importer=ReadWorksheet.Cells[i, 11].Value.ToString();
+                }
+                //savedTransactions.Add(new Transaction(writeoutDate, transactionDate, balance, transactionPrice, accountNumber, description));
+                i++;
+            }
+        }
+        public static List<Transaction> getSavedTransactionsBank()
         {
              return savedTransactions;
         }
-        public static void addToSavedTransactions(List<Transaction> newImported)
+        public static void addToSavedTransactionsBank(List<Transaction> newImported)
         {
             for(int i=0;i<newImported.Count;i++)
             {

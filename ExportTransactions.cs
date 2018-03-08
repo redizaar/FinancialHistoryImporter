@@ -34,7 +34,7 @@ namespace WpfApp1
             MessageBox.Show("Exporting data from: " + currentFileName, "", MessageBoxButton.OK);
                                                     //BUT FIRST - check if the transaction is already exported or not 
             List<Transaction> neededTransactions = newTransactions(transactions);
-            SavedTransactions.addToSavedTransactions(neededTransactions);//adding the freshyl imported transactions to the saved 
+            SavedTransactions.addToSavedTransactionsBank(neededTransactions);//adding the freshyl imported transactions to the saved 
             WriteWorkbook = excel.Workbooks.Open(@"C:\Users\Tocki\Desktop\Kimutatas.xlsx");
             WriteWorksheet = WriteWorkbook.Worksheets[1];
             if (neededTransactions != null)
@@ -91,7 +91,7 @@ namespace WpfApp1
         }
         private List<Transaction> newTransactions(List<Transaction> importedTransactions) //check if the transaction is already exported or not
         {
-            List<Transaction> savedTransactions = SavedTransactions.getSavedTransactions();
+            List<Transaction> savedTransactions = SavedTransactions.getSavedTransactionsBank();
             List<Transaction> neededTransactions=new List<Transaction>();
             importerAccountNumber = importedTransactions[0].getAccountNumber();//account number is the same for all
             ThreadStart threadStart = delegate
@@ -233,7 +233,7 @@ namespace WpfApp1
                 }
             }
         }
-        public ExportTransactions(List<Transaction> transactions, MainWindow mainWindow,string currentFileName)
+        public ExportTransactions(List<Stock> transactions, MainWindow mainWindow,string currentFileName)
         {
 
         }

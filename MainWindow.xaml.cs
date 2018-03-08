@@ -105,8 +105,9 @@ namespace WpfApp1
 
         private void startUpReadIn()
         {
-            //reading in the already saved transactions
-            SavedTransactions.getInstance();
+            //reading in saved transactions
+            SavedTransactions.getInstance().readOutSavedBankTransactions();
+            //SavedTransactions.getInstance().readOutStockSavedTransactions();
         }
         public void getTransactions(string bankName,List<string> folderAddress)
         {
