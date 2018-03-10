@@ -106,7 +106,6 @@ namespace WpfApp1
 
             //ticker is the same for all
             string ticker = stocksForSql[0].getSymbolToSql();
-            string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
             SqlConnection sqlConn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=StockData;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             sqlConn.Open();
             string loginQuery = "Select * From [Stock_WebData] where Name = '"+ticker+"'";

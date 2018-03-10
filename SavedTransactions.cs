@@ -84,10 +84,10 @@ namespace WpfApp1
 
                 stockPriceString = ReadWorksheet.Cells[i, 4].Value.ToString().Replace(',','.');
                 stockPrice = double.Parse(stockPriceString, CultureInfo.InvariantCulture);
-                if(ReadWorksheet.Cells[i,5].Value!=null)//eladott
+                if(ReadWorksheet.Cells[i,4].Value!=null)//eladott
                 {
-                    quantityString = ReadWorksheet.Cells[i, 4].Value.ToString();
-                    quantity=int.Parse(quantityString)*(-1);
+                    quantityString = ReadWorksheet.Cells[i, 5].Value.ToString();
+                    quantity=int.Parse(quantityString);
                     transactionType = "Sell";
                 }
                 else if(ReadWorksheet.Cells[i,6].Value!=null)//vásárolt
@@ -96,9 +96,9 @@ namespace WpfApp1
                     quantity = int.Parse(quantityString);
                     transactionType = "Buy";
                 }
-                if(ReadWorksheet.Cells[i,11].Value!=null)
+                if(ReadWorksheet.Cells[i,12].Value!=null)
                 {
-                    importer=ReadWorksheet.Cells[i, 11].Value.ToString();
+                    importer=ReadWorksheet.Cells[i, 12].Value.ToString();
                 }
                 //savedTransactions.Add(new Transaction(writeoutDate, transactionDate, balance, transactionPrice, accountNumber, description));
                 i++;

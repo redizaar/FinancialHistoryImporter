@@ -174,17 +174,12 @@
         <StackPanel>
             <DockPanel Background="#8b9dc3">
                 <Label Content="Symbol of Share: " FontSize="15"/>
-                <ComboBox Width="100" ></ComboBox>
-                <Label Content="From: " FontSize="14" HorizontalAlignment="Left"/>
-                <ComboBox x:Name="yearComboBox" Width="70" />
-                <ComboBox x:Name="monthComboBox" Width="70"  />
-                <ComboBox x:Name="dayComboBox" Width="70" />
-                <Button x:Name="SQLButton" Content="Show Data" Width="100" HorizontalAlignment="Center" Margin="50,0,0,0" ToolTip="Getting the stored data from SQL"/>
-                <Button x:Name="switchToTable" Width="35" HorizontalAlignment="Right" ToolTip="Switch views to display the requested data in a Chart">
+                <ComboBox x:Name="symbolComboBox" Width="100" SelectionChanged="symbolComboBox_SelectionChanged" ></ComboBox>
+                <Button x:Name="switchToTable" Width="35" HorizontalAlignment="Right" ToolTip="Switch views to display the requested data in a Chart"  Click="switchToTable_Click">
                     <Image Source="chartIcon.png" Height="30"/>
                 </Button>
             </DockPanel>
-            <DataGrid Name="TransactionTableXAML" HorizontalAlignment="Left" VerticalAlignment="Top" Height="270">
+            <DataGrid Name="storedStockDataGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Height="265">
             <DataGrid.Resources>
                 <Style TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -221,11 +216,11 @@
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header=" Date " Width="auto"/>
-                <DataGridTextColumn Header=" Open Price" Width="auto"/>
-                <DataGridTextColumn Header=" Lowest Price"  Width="auto"/>
-                <DataGridTextColumn Header=" Highest Price" Width="auto"/>
-                <DataGridTextColumn Header=" Close Price" Width="*"/>
+                <DataGridTextColumn Header=" Date " Width="*" Binding="{Binding date}"/>
+                <DataGridTextColumn Header=" Open Price" Width="*" Binding="{Binding openPrice}"/>
+                <DataGridTextColumn Header=" Lowest Price"  Width="*" Binding="{Binding highPrice}"/>
+                <DataGridTextColumn Header=" Highest Price" Width="*" Binding="{Binding lowPrice}"/>
+                <DataGridTextColumn Header=" Close Price" Width="*" Binding="{Binding closePrice}"/>
             </DataGrid.Columns>
         </DataGrid>
         </StackPanel>
