@@ -11,15 +11,12 @@ namespace WpfApp1
 {
     public class WebStockData
     {
-        private List<Stock> stocks;
         private List<string> dates;
         private List<double> prices;
+        private List<Stock> stocksForSql;
         public WebStockData()
         {
-            stocks = new List<Stock>();
-            //todo
-            //cant call this class more than one whitin a minute
-            //because the ip address will get blocked
+            stocksForSql = new List<Stock>();
         }
         public void getCSVDataFromGoogle(string ticker,string day,string month,string year)
         {
@@ -36,16 +33,24 @@ namespace WpfApp1
             int j = 0;
             string regex = "[0-9]{2}-[a-zA-Z]{3}-[0-9]{2}";
             string regex2 = "[0-9]-[a-zA-Z]{3}-[0-9]{2}";
+            string tempDate="";
             for (int i = 0; i < lines.Length; i++)
             {
                 if ((Regex.IsMatch(lines[i], regex)) || (Regex.IsMatch(lines[i], regex2)))
                 {
                     string[] date = lines[i].Split('\n');
                     dates.Add(date[1]);
+                    tempDate = date[1];
                 }
                 if (i > 4 && j == 4)
                 {
-                    prices.Add(double.Parse(lines[i].Replace('.',',')));
+                    double openPrice = double.Parse(lines[i-3].Replace('.', ','));
+                    double highPrice = double.Parse(lines[i-2].Replace('.', ','));
+                    double lowPrice = double.Parse(lines[i-1].Replace('.', ','));
+                    double closePrice = double.Parse(lines[i].Replace('.', ','));
+                    Stock stock = new Stock(ticker, tempDate,openPrice,highPrice,lowPrice,closePrice);
+                    stocksForSql.Add(stock);
+                    prices.Add(closePrice);
                     j = 0;
                 }
                 else if (i > 4)
@@ -53,7 +58,7 @@ namespace WpfApp1
             }
             ThreadStart threadStart = delegate
             {
-                writeStocksToSQL(ticker, dates ,prices);
+                writeStocksToSQL(stocksForSql);
             };
             Thread sqlThread = new Thread(threadStart);
             sqlThread.IsBackground = true;
@@ -94,11 +99,13 @@ namespace WpfApp1
             }
         }
         */
-        private void writeStocksToSQL(string ticker,List<string> new_dates,List<double> new_prices)
+        private void writeStocksToSQL(List<Stock> stocksFromCSV)
         {
             //elől vannak a friss dátumok, árak
             //atatbázusba nyilván fordítva
-            //https://stackoverflow.com/questions/41161104/error-converting-data-type-varchar-to-float-c-sharp-webservice
+
+            //ticker is the same for all
+            string ticker = stocksForSql[0].getSymbolToSql();
             string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
             SqlConnection sqlConn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=StockData;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             sqlConn.Open();
@@ -108,14 +115,17 @@ namespace WpfApp1
             sda.Fill(dtb);
             if (dtb.Rows.Count == 0)
             {
-                SqlCommand sqlCommand = new SqlCommand("insertStockDataNew4", sqlConn);//SQLQuery 4
+                SqlCommand sqlCommand = new SqlCommand("insertStockDataToSql", sqlConn);//SQLQuery 7
                 sqlCommand.CommandType = CommandType.StoredProcedure;
-                for (int i = new_dates.Count-1; i > 0; i--)
+                for (int i = stocksForSql.Count-1; i > 0; i--)
                 {
                     sqlCommand.Parameters.Clear();
-                    sqlCommand.Parameters.AddWithValue("@name", ticker);
-                    sqlCommand.Parameters.AddWithValue("@price", new_prices[i]);
-                    sqlCommand.Parameters.AddWithValue("@date", new_dates[i]);
+                    sqlCommand.Parameters.AddWithValue("@name", stocksForSql[i].getSymbolToSql());
+                    sqlCommand.Parameters.AddWithValue("@date", stocksForSql[i].getDateToSql());
+                    sqlCommand.Parameters.AddWithValue("@openprice", stocksForSql[i].getOpenPrice());
+                    sqlCommand.Parameters.AddWithValue("@highprice", stocksForSql[i].getHighPrice());
+                    sqlCommand.Parameters.AddWithValue("@lowprice", stocksForSql[i].getLowPrice());
+                    sqlCommand.Parameters.AddWithValue("@closeprice", stocksForSql[i].getClosePrice());
                     sqlCommand.ExecuteNonQuery();
                 }
             }
@@ -123,13 +133,13 @@ namespace WpfApp1
             {
                 bool storedinSql;
                 List<int> notStoredIndexes = new List<int>();
-                for (int i = 0; i < new_dates.Count; i++)
+                for (int i = 0; i < stocksForSql.Count; i++)
                 {
                     storedinSql = false;
                     foreach (DataRow row in dtb.Rows)
                     {
                         string dateFromSql = row["Date"].ToString();
-                        if(new_dates[i]==dateFromSql)
+                        if(stocksForSql[i].getDateToSql()==dateFromSql)
                         {
                             storedinSql = true;
                             break;
@@ -142,14 +152,17 @@ namespace WpfApp1
                 }
                 if (notStoredIndexes.Count > 0)
                 {
-                    SqlCommand sqlCommand = new SqlCommand("insertStockDataNew4", sqlConn);//SQLQuery 4
+                    SqlCommand sqlCommand = new SqlCommand("insertStockDataToSql", sqlConn);//SQLQuery 7
                     sqlCommand.CommandType = CommandType.StoredProcedure;
                     for (int i = 0; i < notStoredIndexes.Count; i++)
                     {
                         sqlCommand.Parameters.Clear();
-                        sqlCommand.Parameters.AddWithValue("@name", ticker);
-                        sqlCommand.Parameters.AddWithValue("@price", new_prices[notStoredIndexes[i]]);
-                        sqlCommand.Parameters.AddWithValue("@date", new_dates[notStoredIndexes[i]]);
+                        sqlCommand.Parameters.AddWithValue("@name", stocksForSql[notStoredIndexes[i]].getSymbolToSql());
+                        sqlCommand.Parameters.AddWithValue("@date", stocksForSql[notStoredIndexes[i]].getDateToSql());
+                        sqlCommand.Parameters.AddWithValue("@openprice", stocksForSql[notStoredIndexes[i]].getOpenPrice());
+                        sqlCommand.Parameters.AddWithValue("@highprice", stocksForSql[notStoredIndexes[i]].getHighPrice());
+                        sqlCommand.Parameters.AddWithValue("@lowprice", stocksForSql[notStoredIndexes[i]].getLowPrice());
+                        sqlCommand.Parameters.AddWithValue("@closeprice", stocksForSql[notStoredIndexes[i]].getClosePrice());
                         sqlCommand.ExecuteNonQuery();
                     }
                 }

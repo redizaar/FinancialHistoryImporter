@@ -94,6 +94,9 @@
     <Compile Include="StockChart.xaml.cs">
       <DependentUpon>StockChart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StockDataGrid.xaml.cs">
+      <DependentUpon>StockDataGrid.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StoredColumnChecker.cs" />
     <Compile Include="TemplateBankReadIn.cs" />
     <Compile Include="TemplateStockReadIn.cs" />
@@ -133,6 +136,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="StockChart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StockDataGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -239,6 +246,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="chartIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="tableView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="chartIcon2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="databaseIcon4.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

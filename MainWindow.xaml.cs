@@ -31,18 +31,6 @@ namespace WpfApp1
         {
             currentUser = user;
         }
-        /*
-        public void setTableAttributes(List<Transaction> impoertedTransactions,string accountNumber)
-        {
-            tableAttributes = impoertedTransactions;
-            this.accountNumber = accountNumber;
-        }
-        public void setTableAttributes(List<Transaction> impoertedTransactions,bool newImport)
-        {
-            tableAttributes = impoertedTransactions;
-            newImport = true;
-        }
-        */
         public bool getNewImport()
         {
             return newImport;
@@ -51,12 +39,6 @@ namespace WpfApp1
         {
             return accountNumber;
         }
-        /*
-        public List<Transaction> getTableAttributes()
-        {
-            return tableAttributes;
-        }
-        */
         public User getCurrentUser()
         {
             return currentUser;
@@ -167,16 +149,16 @@ namespace WpfApp1
                 if (mainWindow.webStockStopwatch.Elapsed == TimeSpan.FromMilliseconds(0))
                 {
                     mainWindow.webStockStopwatch.Start();
-                    StockChart stockChart = new StockChart();
+                    StockChart stockChart = new StockChart(mainWindow);
                     mainWindow.MainFrame.Content = stockChart;
                     mainWindow.portfolioMenuTop.Visibility = System.Windows.Visibility.Visible;
                     mainWindow.stockChartDock.Background = new SolidColorBrush(Color.FromRgb(198, 61, 15));
                 }
                 else
                 {
-                    if (mainWindow.webStockStopwatch.Elapsed <= TimeSpan.FromMinutes(1.5))
+                    if (mainWindow.webStockStopwatch.Elapsed <= TimeSpan.FromMinutes(0.2))
                     {
-                        MessageBox.Show("Please wait for " + (TimeSpan.FromMinutes(1.5) - mainWindow.webStockStopwatch.Elapsed) + " seconds!");
+                        MessageBox.Show("Please wait for " + (TimeSpan.FromMinutes(0.2) - mainWindow.webStockStopwatch.Elapsed) + " seconds!");
                     }
                     else
                     {

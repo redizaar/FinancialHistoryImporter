@@ -24,6 +24,7 @@ namespace WpfApp1
         public ChartValues<double> ValuesA { get; set; }
         public List<string> Labels { get; set; }
         private SeriesCollection _Series;
+        private MainWindow mainWindow;
         public SeriesCollection Series
         {
             get
@@ -40,8 +41,9 @@ namespace WpfApp1
         public WebStockData webStockData;
         //public ChartValues<double> ValuesB { get; set; }
         //public ChartValues<double> ValuesC { get; set; }
-        public StockChart()
+        public StockChart(MainWindow mainWindow)
         {
+            this.mainWindow = mainWindow;
             InitializeComponent();
             DataContext = this;
             months = new List<string>();
@@ -139,7 +141,15 @@ namespace WpfApp1
         {
             get
             {
-                btnCommand = new ButtonCommands(this);
+                btnCommand = new ButtonCommands(this,"DownloadData",mainWindow);
+                return btnCommand;
+            }
+        }
+        public ButtonCommands switchPage
+        {
+            get
+            {
+                btnCommand = new ButtonCommands(this, "SQLData",mainWindow);
                 return btnCommand;
             }
         }
@@ -164,7 +174,7 @@ namespace WpfApp1
                     if (monthComboBox.SelectedIndex == (DateTime.Now.Month) - 1)
                     {
                         int passedDaysThisMonth = DateTime.Now.Day;
-                        for (int i = 1; i < passedDaysThisMonth; i++)
+                        for (int i = 1; i < passedDaysThisMonth + 1; i++)
                         {
                             dayComboBox.Items.Add(i);
                         }
@@ -172,7 +182,7 @@ namespace WpfApp1
                     else
                     {
                         int daysInMonth = DateTime.DaysInMonth(DateTime.Now.Year, (monthComboBox.SelectedIndex) + 1);
-                        for (int i = 1; i != daysInMonth; i++)
+                        for (int i = 1; i < daysInMonth + 1; i++)
                         {
                             dayComboBox.Items.Add(i);
                         }
@@ -214,12 +224,16 @@ namespace WpfApp1
             private StockChart stockChart;
             private DispatcherTimer timer1;
             private static int tik;
-            public ButtonCommands(StockChart stockChart)
+            private string action;
+            private MainWindow mainWindow;
+            public ButtonCommands(StockChart stockChart,string _action,MainWindow mainWindow)
             {
+                action = _action;
+                this.mainWindow = mainWindow;
                 this.stockChart = stockChart;
                 this.stockChart.PropertyChanged += new PropertyChangedEventHandler(test_PropertyChanged);
                 timer1 = new DispatcherTimer();
-                tik = 60;
+                tik = 20;
             }
             private void test_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
@@ -238,25 +252,28 @@ namespace WpfApp1
 
             public void Execute(object parameter)
             {
-                if (tik == 60)
+                if (action == "DownloadData")
                 {
-                    string ticker = stockChart.tickerTextBox.Text.ToString();
-                    string year = stockChart.yearComboBox.SelectedItem.ToString();
-                    string month = stockChart.monthComboBox.SelectedItem.ToString();
-                    string day = stockChart.dayComboBox.SelectedItem.ToString();
-                    if (int.Parse(day) < 10)
-                        stockChart.webStockData.getCSVDataFromGoogle(ticker, "0" + day, month, year);
-                    else
-                        stockChart.webStockData.getCSVDataFromGoogle(ticker, day, month, year);
-                    stockChart.refreshCSVChartAttribues();
-                    timer1.Interval = new TimeSpan(0, 0, 0, 1);
-                    timer1.Tick += new EventHandler(timer1_Tick);
-                    timer1.Start();
-                    stockChart.downloadButton.IsEnabled = false;
+                    if (tik == 20)
+                    {
+                        string ticker = stockChart.tickerTextBox.Text.ToString();
+                        string year = stockChart.yearComboBox.SelectedItem.ToString();
+                        string month = stockChart.monthComboBox.SelectedItem.ToString();
+                        string day = stockChart.dayComboBox.SelectedItem.ToString();
+                        if (int.Parse(day) < 10)
+                            stockChart.webStockData.getCSVDataFromGoogle(ticker, "0" + day, month, year);
+                        else
+                            stockChart.webStockData.getCSVDataFromGoogle(ticker, day, month, year);
+                        stockChart.refreshCSVChartAttribues();
+                        timer1.Interval = new TimeSpan(0, 0, 0, 1);
+                        timer1.Tick += new EventHandler(timer1_Tick);
+                        timer1.Start();
+                        stockChart.downloadButton.IsEnabled = false;
+                    }
                 }
-                else
+                else if(action=="SQLData")
                 {
-
+                    mainWindow.MainFrame.Content = new StockDataGrid(mainWindow);
                 }
             }
             void timer1_Tick(object sender, EventArgs e)
@@ -267,7 +284,7 @@ namespace WpfApp1
                 else
                 {
                     stockChart.downloadButton.IsEnabled = true;
-                    stockChart.downloadButton.Content = "Get Data";
+                    stockChart.downloadButton.Content = "Download Data";
                 }
             }
         }
