@@ -169,6 +169,36 @@ namespace WpfApp1
             }
             return instance;
         }
+        public static ImportPageBank getInstance(MainWindow mainWindow,string transition)
+        {
+            //when this function called it's 100% not null
+            //because we already made ImportPageBank a content one time, so it is initalized
+            //just makeing the page switch animation back from ImportPageStock
+            instance.Loaded += Instance_Loaded;
+            return instance;
+        }
+        private static void Instance_Loaded(object sender, RoutedEventArgs e)
+        {
+            switch (instance.pageLoadAnimation)
+            {
+                case PageAnimation.SlideAndFadeInFromRight:
+                    var sb = new Storyboard();
+                    var slideAnimation = new ThicknessAnimation
+                    {
+                        Duration = new Duration(TimeSpan.FromSeconds(instance.slideSenconds)),
+                        From = new Thickness(instance.WindowWidth, 0, -instance.WindowWidth, 0),
+                        To = new Thickness(0),
+                        DecelerationRatio = 0.9f
+                    };
+                    Storyboard.SetTargetProperty(slideAnimation, new PropertyPath("Margin"));
+                    sb.Children.Add(slideAnimation);
+                    sb.Begin(instance);
+                    break;
+                case PageAnimation.SlideAndFadeOutToLeft:
+                    break;
+            }
+        }
+
         public class ButtonCommands : ICommand
         {
             private string buttonContent;
@@ -278,7 +308,7 @@ namespace WpfApp1
         }
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            mainWindow.MainFrame.Content = new ImportPageStock(mainWindow);
+            mainWindow.MainFrame.Content = ImportPageStock.getInstance(mainWindow);
         }
     }
 }

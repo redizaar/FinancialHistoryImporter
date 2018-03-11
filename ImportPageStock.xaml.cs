@@ -17,24 +17,63 @@ namespace WpfApp1
     /// </summary>
     public partial class ImportPageStock : System.Windows.Controls.Page
     {
+        public bool _lifoMethod  = true;
+        public bool _fifoMethod  = false;
+        public bool _customMethod  = false;
+        public bool lifoMethod
+        {
+            get
+            {
+                return _lifoMethod;
+            }
+            set
+            {
+                _lifoMethod = value;
+            }
+        }
+        public bool fifoMethod
+        {
+            get
+            {
+                return _fifoMethod;
+            }
+            set
+            {
+                _fifoMethod = value;
+            }
+        }
+        public bool customMethod
+        {
+            get
+            {
+                return _customMethod;
+            }
+            set
+            {
+                _customMethod = value;
+            }
+        }
         public PageAnimation pageLoadAnimation { get; set; } = PageAnimation.SlideAndFadeInFromRight;
         public PageAnimation pageUnloadAnimation { get; set; } = PageAnimation.SlideAndFadeOutToLeft;
         public double slideSenconds { get; set; } = 0.5;
         public MainWindow mainWindow;
-        public ImportPageStock(MainWindow mainWindow)
+        private static ImportPageStock instance; 
+        private ImportPageStock(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
             DataContext = this;
             InitializeComponent();
-            this.Loaded += ImportPageStock_Loaded;
         }
-
-        private async void ImportPageStock_Loaded(object sender, RoutedEventArgs e)
+        public static ImportPageStock getInstance(MainWindow mainWindow)
         {
-            await pageLoad();
+            if(instance==null)
+            {
+                instance = new ImportPageStock(mainWindow);
+            }
+            instance.Loaded += instance.ImportPageStock_Loaded;
+            return instance;
         }
-
-        public async Task pageLoad()
+        private  void ImportPageStock_Loaded(object sender, RoutedEventArgs e)
         {
             switch (pageLoadAnimation)
             {
@@ -55,11 +94,6 @@ namespace WpfApp1
                     break;
             }
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
         private void FileBrowser_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -136,6 +170,20 @@ namespace WpfApp1
                 app.Quit();
                 fileAddresses[fileIndex] = newExcelPath; //overwriting the old path string
             }
+        }
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            mainWindow.MainFrame.Content = ImportPageBank.getInstance(mainWindow, "switch");
+        }
+        public string getMethod()
+        {
+            if (_lifoMethod)
+                return "LIFO";
+            else if (_fifoMethod)
+                return "FIFO";
+            else if (_customMethod)
+                return "CUSTOM";
+            return "LIFO";
         }
     }
 }

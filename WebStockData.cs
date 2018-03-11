@@ -121,10 +121,10 @@ namespace WpfApp1
                     sqlCommand.Parameters.Clear();
                     sqlCommand.Parameters.AddWithValue("@name", stocksForSql[i].getSymbolToSql());
                     sqlCommand.Parameters.AddWithValue("@date", stocksForSql[i].getDateToSql());
-                    sqlCommand.Parameters.AddWithValue("@openprice", stocksForSql[i].getOpenPrice());
-                    sqlCommand.Parameters.AddWithValue("@highprice", stocksForSql[i].getHighPrice());
-                    sqlCommand.Parameters.AddWithValue("@lowprice", stocksForSql[i].getLowPrice());
-                    sqlCommand.Parameters.AddWithValue("@closeprice", stocksForSql[i].getClosePrice());
+                    sqlCommand.Parameters.AddWithValue("@openprice", stocksForSql[i].getOpenPriceForSql());
+                    sqlCommand.Parameters.AddWithValue("@highprice", stocksForSql[i].getHighPriceForSql());
+                    sqlCommand.Parameters.AddWithValue("@lowprice", stocksForSql[i].getLowPriceForSql());
+                    sqlCommand.Parameters.AddWithValue("@closeprice", stocksForSql[i].getClosePriceForSql());
                     sqlCommand.ExecuteNonQuery();
                 }
             }
@@ -158,10 +158,10 @@ namespace WpfApp1
                         sqlCommand.Parameters.Clear();
                         sqlCommand.Parameters.AddWithValue("@name", stocksForSql[notStoredIndexes[i]].getSymbolToSql());
                         sqlCommand.Parameters.AddWithValue("@date", stocksForSql[notStoredIndexes[i]].getDateToSql());
-                        sqlCommand.Parameters.AddWithValue("@openprice", stocksForSql[notStoredIndexes[i]].getOpenPrice());
-                        sqlCommand.Parameters.AddWithValue("@highprice", stocksForSql[notStoredIndexes[i]].getHighPrice());
-                        sqlCommand.Parameters.AddWithValue("@lowprice", stocksForSql[notStoredIndexes[i]].getLowPrice());
-                        sqlCommand.Parameters.AddWithValue("@closeprice", stocksForSql[notStoredIndexes[i]].getClosePrice());
+                        sqlCommand.Parameters.AddWithValue("@openprice", stocksForSql[notStoredIndexes[i]].getOpenPriceForSql());
+                        sqlCommand.Parameters.AddWithValue("@highprice", stocksForSql[notStoredIndexes[i]].getHighPriceForSql());
+                        sqlCommand.Parameters.AddWithValue("@lowprice", stocksForSql[notStoredIndexes[i]].getLowPriceForSql());
+                        sqlCommand.Parameters.AddWithValue("@closeprice", stocksForSql[notStoredIndexes[i]].getClosePriceForSql());
                         sqlCommand.ExecuteNonQuery();
                     }
                 }

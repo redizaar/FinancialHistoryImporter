@@ -127,55 +127,59 @@ namespace WpfApp1
 
         public void readOutTransactions()
         {
-            importedStocks = new List<Stock>();
-            int blank_cell_counter = 0;
-            int row = 2;
-            while(blank_cell_counter<2)
+            if ((companyNameColumn != 0) || (transactionDateColumn != 0) || (priceColumn != 0))
             {
-                if((stockWorksheet.Cells[row,companyNameColumn].Value!=null) && 
-                        (stockWorksheet.Cells[row,transactionDateColumn].Value!=null) &&
-                        (stockWorksheet.Cells[row,priceColumn].Value!=null))
+                importedStocks = new List<Stock>();
+                int blank_cell_counter = 0;
+                int row = 2;
+                while (blank_cell_counter < 2)
                 {
-                    blank_cell_counter = 0;
-                    string companyName = stockWorksheet.Cells[row, companyNameColumn].Value.ToString();
-                    string transactionDate = stockWorksheet.Cells[row, transactionDateColumn].Value.ToString();
-                    string transactionPriceString = stockWorksheet.Cells[row, priceColumn].Value.ToString().Replace(',','.');
-                    double transactionPrice = 0;
-                    try
+                    if ((stockWorksheet.Cells[row, companyNameColumn].Value != null) &&
+                            (stockWorksheet.Cells[row, transactionDateColumn].Value != null) &&
+                            (stockWorksheet.Cells[row, priceColumn].Value != null))
                     {
-                        transactionPrice = double.Parse(transactionPriceString, CultureInfo.InvariantCulture);
-                    }
-                    catch(Exception e)
-                    {
-
-                    }
-                    string transactionType="-";
-                    string quantityString="";
-                    int quantity=0;
-                    if(stockWorksheet.Cells[row,transactionTypeColumn].Value!=null)
-                    {
-                        transactionType = stockWorksheet.Cells[row, transactionTypeColumn].Value.ToString();
-                    }
-                    if(stockWorksheet.Cells[row,quantityColumn].Value!=null)
-                    {
-                        quantityString = stockWorksheet.Cells[row, quantityColumn].Value.ToString();
+                        blank_cell_counter = 0;
+                        string companyName = stockWorksheet.Cells[row, companyNameColumn].Value.ToString();
+                        string transactionDate = stockWorksheet.Cells[row, transactionDateColumn].Value.ToString();
+                        string transactionPriceString = stockWorksheet.Cells[row, priceColumn].Value.ToString().Replace(',', '.');
+                        double transactionPrice = 0;
                         try
                         {
-                            quantity = int.Parse(quantityString);
+                            transactionPrice = double.Parse(transactionPriceString, CultureInfo.InvariantCulture);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
 
                         }
+                        string transactionType = "-";
+                        string quantityString = "";
+                        int quantity = 0;
+                        if (stockWorksheet.Cells[row, transactionTypeColumn].Value != null)
+                        {
+                            transactionType = stockWorksheet.Cells[row, transactionTypeColumn].Value.ToString();
+                        }
+                        if (stockWorksheet.Cells[row, quantityColumn].Value != null)
+                        {
+                            quantityString = stockWorksheet.Cells[row, quantityColumn].Value.ToString();
+                            try
+                            {
+                                quantity = int.Parse(quantityString);
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
+                        }
+                        Stock stock = new Stock(companyName, transactionPrice, quantity, transactionDate, transactionType);
+                        importedStocks.Add(stock);
                     }
-                    Stock stock = new Stock(companyName, transactionPrice, quantity, transactionDate, transactionType);
-                    importedStocks.Add(stock);
+                    else
+                    {
+                        blank_cell_counter++;
+                    }
+                    row++;
                 }
-                else
-                {
-                    blank_cell_counter++;
-                }
-                row++;
+                stockHandler.addTransactions(importedStocks);
             }
         }
         private int getPricesToDatesFromCSV(int companyNameColumn,int transactionDateColumn)

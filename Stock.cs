@@ -14,7 +14,7 @@ namespace WpfApp1
         public string transactionDate { get; private set; }
         public string transactionType { get; private set; }
         public string writeDate { get; private set; }
-
+        public int profit { get; private set; }
         //for StockDataGrid
         public string symbol { get; private set; }
         public string date { get; private set; }
@@ -22,6 +22,7 @@ namespace WpfApp1
         public double highPrice { get; private set; }
         public double lowPrice { get; private set; }
         public double closePrice { get; private set; }
+        //reading out from file Constructor
         public Stock(string _stockName,double _stockPrice,int _quantity,string _transactionDate,string _transactionType)
         {
             stockName = _stockName;
@@ -30,7 +31,8 @@ namespace WpfApp1
             transactionDate = _transactionDate;
             transactionType = _transactionType;
         }
-        public Stock(string _writeDate, string _transactionDate,string _stockName,double _stockPrice, int _quantity, string _transactionType)
+        //writing to file Constructor
+        public Stock(string _writeDate, string _transactionDate,string _stockName,double _stockPrice, int _quantity, string _transactionType,int _profit)
         {
             writeDate = _writeDate;
             stockName = _stockName;
@@ -38,6 +40,7 @@ namespace WpfApp1
             quantity = _quantity;
             transactionDate = _transactionDate;
             transactionType = _transactionType;
+            profit = _profit;
         }
         //sql Stock constructor
         public Stock(string _smybol,string _date,double _openPrice,double _highPrice,double _lowPrice,double _closePrice)
@@ -53,23 +56,27 @@ namespace WpfApp1
         {
             return symbol;
         }
+        public int getProfit()
+        {
+            return profit;
+        }
         public string getDateToSql()
         {
             return date;
         }
-        public double getOpenPrice()
+        public double getOpenPriceForSql()
         {
             return openPrice;
         }
-        public double getHighPrice()
+        public double getHighPriceForSql()
         {
             return highPrice;
         }
-        public double getLowPrice()
+        public double getLowPriceForSql()
         {
             return lowPrice;
         }
-        public double getClosePrice()
+        public double getClosePriceForSql()
         {
             return closePrice;
         }
@@ -92,6 +99,10 @@ namespace WpfApp1
         public int getQuantity()
         {
             return quantity;
+        }
+        public void setQuantity(int value)
+        {
+            quantity = value;
         }
     }
 }

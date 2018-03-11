@@ -55,9 +55,16 @@
                 <Label Content="Owned shares : " Margin="208,0,0,0"  FontSize="15" FontWeight="Medium"/>
                 <Label x:Name="ownedSharesLabel" Content="Number by Code"  VerticalAlignment="Center" FontSize="15" FontFamily="Maiandra GD"/>
             </DockPanel>
-                <Button x:Name="FileBrowser" Content="Import Stock Transactions" HorizontalAlignment="Center"  Width="175" Height="45"  Margin="0,5,0,0"
+            <DockPanel>
+                <Label Content="Chose a sell method :" Margin="208,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="Medium"/>
+                <RadioButton x:Name="lifoMethodRB" Content="LIFO"   VerticalAlignment="Center" IsChecked="{Binding lifoMethod, Mode=TwoWay}"/>
+                <RadioButton x:Name="fifoMethodRB"  Content="FIFO"   VerticalAlignment="Center" IsChecked="{Binding fifoMethod, Mode=TwoWay}"/>
+                <RadioButton x:Name="customMethodRB"  Content="CUSTOM"   VerticalAlignment="Center" IsChecked="{Binding customMethod, Mode=TwoWay}"/>
+            </DockPanel>
+            <Button x:Name="FileBrowser" Content="Import Stock Transactions" HorizontalAlignment="Center"  Width="175" Height="45" 
                 Foreground="Black" Style="{StaticResource FileBrowser}" FontFamily="Maiandra GD" FontSize="15" Click="FileBrowser_Click">
             </Button>
         </StackPanel>
+        <Button Content="Swtich to Bank" HorizontalAlignment="Left" Margin="26,74,0,0" VerticalAlignment="Top" Width="100" Click="Button_Click_1"/>
     </Grid>
 </Page>

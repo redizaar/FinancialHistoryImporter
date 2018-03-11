@@ -82,7 +82,7 @@ namespace WpfApp1
 
         private void writeOutStockTransactions()
         {
-            
+            new ExportTransactions(stockTransactions,mainWindow,currentFileName);
         }
 
         public void writeOutBankTransactions()
