@@ -30,7 +30,7 @@ namespace WpfApp1
             transactionDate = _transactionDate;
             transactionType = _transactionType;
         }
-        public Stock(string _writeDate, string _stockName, double _stockPrice, int _quantity, string _transactionDate, string _transactionType)
+        public Stock(string _writeDate, string _transactionDate,string _stockName,double _stockPrice, int _quantity, string _transactionType)
         {
             writeDate = _writeDate;
             stockName = _stockName;

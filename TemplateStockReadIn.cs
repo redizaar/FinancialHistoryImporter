@@ -178,7 +178,6 @@ namespace WpfApp1
                 row++;
             }
         }
-
         private int getPricesToDatesFromCSV(int companyNameColumn,int transactionDateColumn)
         {
             int blank_cell_counter = 0;

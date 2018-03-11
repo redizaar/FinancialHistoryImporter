@@ -191,14 +191,8 @@ namespace WpfApp1
             }
             if (descrColumns.Count != 0)
             {
-                //ImportMainPage.getInstance(mainWindow).descriptionComboBox.Visibility = System.Windows.Visibility.Visible;
                 if (descrColumns.Count == 2)
                 {
-                    for (int i = 0; i < descrColumnNames.Count; i++)
-                    {
-                        ImportMainPage.getInstance(mainWindow).descriptionComboBox.Items.Add(descrColumnNames[i]);
-                    }
-
                     MessageBoxResult messageBoxResult = CustomMessageBox.ShowYesNo(
                         "\tPlease choose a Comment column!",
                         "Alert!",

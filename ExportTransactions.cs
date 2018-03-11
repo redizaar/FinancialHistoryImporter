@@ -82,7 +82,7 @@ namespace WpfApp1
                 {
 
                 }
-                ImportMainPage.getInstance(mainWindow).setUserStatistics(mainWindow.getCurrentUser());
+                ImportPageBank.getInstance(mainWindow).setUserStatistics(mainWindow.getCurrentUser());
             }
             else
             {
@@ -129,7 +129,7 @@ namespace WpfApp1
                                     saved.getBalance_rn() == imported.getBalance_rn())
                             {
                                 redundant = true;
-                                if (ImportMainPage.getInstance(mainWindow).alwaysAsk==true)
+                                if (ImportPageBank.getInstance(mainWindow).alwaysAsk==true)
                                 {
                                     if (MessageBox.Show("This transaction is most likely to be in the Databse already!\n -- Transaction date: " + imported.getTransactionDate() + "\n-- Transaction price: " + imported.getTransactionPrice()
                                         + "\n-- Imported on: " + saved.getWriteDate().Substring(0,12)+"\nWould you like to import it anyways?",

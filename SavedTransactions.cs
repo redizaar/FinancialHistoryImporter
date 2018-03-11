@@ -14,11 +14,12 @@ namespace WpfApp1
         _Application excel = new _Excel.Application();
         Workbook ReadWorkbook;
         Worksheet ReadWorksheet;
-        static List<Transaction> savedTransactions;
+        public static List<Transaction> savedTransactionsBank;
+        public static List<Stock> savedTransactionsStock;
         private static SavedTransactions instance;
         private SavedTransactions()
         {
-            savedTransactions = new List<Transaction>();
+            savedTransactionsBank = new List<Transaction>();
             ReadWorkbook = excel.Workbooks.Open(@"C:\Users\Tocki\Desktop\Kimutatas.xlsx");
         }
         public void readOutSavedBankTransactions()
@@ -56,7 +57,7 @@ namespace WpfApp1
                     description = ReadWorksheet.Cells[i, 14].Value.ToString();
                 }
 
-                savedTransactions.Add(new Transaction(writeoutDate, transactionDate, balance, transactionPrice, accountNumber, description));
+                savedTransactionsBank.Add(new Transaction(writeoutDate, transactionDate, balance, transactionPrice, accountNumber, description));
                 i++;
             }
             //excel.Workbooks.Close(); hiába csinálom ezeket mert úgy is singleton, akkor fog megsemmisülni amikor a program leáll
@@ -100,19 +101,23 @@ namespace WpfApp1
                 {
                     importer=ReadWorksheet.Cells[i, 12].Value.ToString();
                 }
-                //savedTransactions.Add(new Transaction(writeoutDate, transactionDate, balance, transactionPrice, accountNumber, description));
+                savedTransactionsStock.Add(new Stock(writeoutDate, transactionDate, stockName, stockPrice, quantity, transactionType));
                 i++;
             }
         }
         public static List<Transaction> getSavedTransactionsBank()
         {
-             return savedTransactions;
+             return savedTransactionsBank;
+        }
+        public static List<Stock> getSavedTransactionsStock()
+        {
+            return savedTransactionsStock;
         }
         public static void addToSavedTransactionsBank(List<Transaction> newImported)
         {
             for(int i=0;i<newImported.Count;i++)
             {
-                savedTransactions.Add(newImported[i]);
+                savedTransactionsBank.Add(newImported[i]);
             }
         }
         public static SavedTransactions getInstance()

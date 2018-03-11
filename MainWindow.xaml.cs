@@ -132,8 +132,8 @@ namespace WpfApp1
             mainWindow.portfolioMenuTop.Visibility = System.Windows.Visibility.Hidden;
             if (buttonContent.Equals("Import"))
             {
-                ImportMainPage.getInstance(mainWindow).setUserStatistics(mainWindow.getCurrentUser());
-                mainWindow.MainFrame.Content = ImportMainPage.getInstance(mainWindow);
+                ImportPageBank.getInstance(mainWindow).setUserStatistics(mainWindow.getCurrentUser());
+                mainWindow.MainFrame.Content = ImportPageBank.getInstance(mainWindow);
                 mainWindow.importMenuTop.Visibility = System.Windows.Visibility.Visible;
                 mainWindow.importDock.Background = new SolidColorBrush(Color.FromRgb(198, 61, 15));
             }

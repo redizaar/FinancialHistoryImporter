@@ -76,9 +76,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Animation\PageAnimation.cs" />
     <Compile Include="ExportTransactions.cs" />
-    <Compile Include="ImportMainPage.xaml.cs">
-      <DependentUpon>ImportMainPage.xaml</DependentUpon>
+    <Compile Include="ImportPageBank.xaml.cs">
+      <DependentUpon>ImportPageBank.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImportPageStock.xaml.cs">
+      <DependentUpon>ImportPageStock.xaml</DependentUpon>
     </Compile>
     <Compile Include="Login_Page.xaml.cs">
       <DependentUpon>Login_Page.xaml</DependentUpon>
@@ -106,7 +110,11 @@
     </Compile>
     <Compile Include="User.cs" />
     <Compile Include="WebStockData.cs" />
-    <Page Include="ImportMainPage.xaml">
+    <Page Include="ImportPageBank.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImportPageStock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
