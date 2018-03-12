@@ -251,8 +251,7 @@ namespace WpfApp1
 
         private void stockExportFIFO(List<Stock> transactions)
         {
-            List<Stock> soldStocks = new List<Stock>();
-            List<Stock> boughtStocks = new List<Stock>();
+            Dictionary<Stock, int> transactionMap = new Dictionary<Stock, int>();
             List<string> companies = new List<string>();
             foreach(var transaction in transactions)
             {
@@ -263,12 +262,12 @@ namespace WpfApp1
             //{
             string companyName = companies[0];//removing the already scanned companies
             List<Stock> tempTransactions = new List<Stock>();
-            foreach (var transaction in transactions)
+            for(int i=0;i<transactions.Count;i++)
             {
-                if(companyName==transaction.getStockName())
+                if(companyName==transactions[i].getStockName())
                 {
-                    Console.WriteLine(transaction.getStockName());
-                    tempTransactions.Add(transaction);
+                    tempTransactions.Add(transactions[i]);
+                    transactionMap.Add(transactions[i], i);
                 }
             }
             if (tempTransactions.Count > 1)
@@ -303,76 +302,252 @@ namespace WpfApp1
                             quantityRegex3.IsMatch(tempTransactions[i].getTransactionType()))
                         {
                             boughtStock = tempTransactions[i];
-                            boughtIndex = i; //for (boughtStock.getQuantity() - soldStock.getQuantity()) <0
+                            boughtIndex = i;
                             break;
                         }
                     }
                     if (boughtStock != null)
                     {
-                        double profit = 0;
-                        if ((boughtStock.getQuantity() - soldStock.getQuantity()) == 0)
+                        while (true)
                         {
-                            profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
-                        }
-                        else if((boughtStock.getQuantity() - soldStock.getQuantity()) <0)
-                        {
-                            //it's important to multiple it by the boughtStock,
-                            //because the soldStock quantity is higher than the bought
-                            profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * boughtStock.getQuantity();
-                            int leftQuantity = soldStock.getQuantity() - boughtStock.getQuantity();
-                            soldStock.setQuantity(leftQuantity);
-                            while (soldStock.getQuantity() != 0)
+                            double profit = 0;
+                            if ((boughtStock.getQuantity() - soldStock.getQuantity()) == 0)
                             {
+                                profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                int index = transactionMap[soldStock];
+                                transactions[index].setProfit(profit);
                                 if (boughtIndex - 1 != soldIndex)
+                                    boughtIndex--;
+                            }
+                            else if ((boughtStock.getQuantity() - soldStock.getQuantity()) < 0)
+                            {
+                                //it's important to multiple it by the boughtStock,
+                                //because the soldStock quantity is higher than the bought
+                                profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * boughtStock.getQuantity();
+                                int leftQuantity = soldStock.getQuantity() - boughtStock.getQuantity();
+                                soldStock.setQuantity(leftQuantity);
+                                while (soldStock.getQuantity() != 0)
                                 {
-                                    for (int i = boughtIndex - 1; i >= soldIndex; i--)
+                                    if (boughtIndex - 1 != soldIndex)
                                     {
-                                        Regex quantityRegex1 = new Regex(@"Vásárolt");
-                                        Regex quantityRegex2 = new Regex(@"Bought");
-                                        Regex quantityRegex3 = new Regex(@"Buy");
-                                        if (quantityRegex1.IsMatch(tempTransactions[i].getTransactionType()) ||
-                                            quantityRegex2.IsMatch(tempTransactions[i].getTransactionType()) ||
-                                            quantityRegex3.IsMatch(tempTransactions[i].getTransactionType()))
+                                        for (int i = boughtIndex; i >= soldIndex; i--)
                                         {
-                                            boughtStock = tempTransactions[i];
-                                            boughtIndex = i;
-                                            break;
+                                            Regex quantityRegex1 = new Regex(@"Vásárolt");
+                                            Regex quantityRegex2 = new Regex(@"Bought");
+                                            Regex quantityRegex3 = new Regex(@"Buy");
+                                            if (quantityRegex1.IsMatch(tempTransactions[i].getTransactionType()) ||
+                                                quantityRegex2.IsMatch(tempTransactions[i].getTransactionType()) ||
+                                                quantityRegex3.IsMatch(tempTransactions[i].getTransactionType()))
+                                            {
+                                                boughtStock = tempTransactions[i];
+                                                boughtIndex = i;
+                                                break;
+                                            }
                                         }
+                                        /**
+                                         * We change the bought Stocks quantity because if we have other SOLD stocks we dont want it to count
+                                         * with the full quantity (There would be a mistake)
+                                         */
+                                        if (soldStock.getQuantity() > boughtStock.getQuantity())
+                                        {
+                                            leftQuantity = soldStock.getQuantity() - boughtStock.getQuantity();
+                                            profit += (soldStock.getStockPrice() - boughtStock.getStockPrice()) * boughtStock.getQuantity();
+                                        }
+                                        else if (boughtStock.getQuantity() > soldStock.getQuantity())
+                                        {
+                                            leftQuantity = 0;
+                                            profit += (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                            int leftBoughtQuantity = boughtStock.getQuantity() - soldStock.getQuantity();
+                                            boughtStock.setQuantity(leftBoughtQuantity);
+                                        }
+                                        else if (boughtStock.getQuantity() == soldStock.getQuantity())
+                                        {
+                                            leftQuantity = 0;
+                                            profit += (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                        }
+                                        soldStock.setQuantity(leftQuantity);
                                     }
-                                    if (soldStock.getQuantity() > boughtStock.getQuantity())
+                                    else//we reached the sell transaction but the quantity is still not zero, ? to do in that case
                                     {
-                                        leftQuantity = soldStock.getQuantity() - boughtStock.getQuantity();
-                                        profit += (soldStock.getStockPrice()-boughtStock.getStockPrice())*boughtStock.getQuantity();
+                                        soldStock.setQuantity(0);
                                     }
-                                    else if (boughtStock.getQuantity() > soldStock.getQuantity())
-                                    {
-                                        leftQuantity = 0;
-                                        profit += (soldStock.getStockPrice()-boughtStock.getStockPrice())*soldStock.getQuantity();
-                                    }
-                                    else if (boughtStock.getQuantity() == soldStock.getQuantity())
-                                    {
-                                        leftQuantity = 0;
-                                        profit += (soldStock.getStockPrice()-boughtStock.getStockPrice())*soldStock.getQuantity();
-                                    }
-                                    soldStock.setQuantity(leftQuantity);
                                 }
-                                else//we reached the sell transaction but the quantity is still not zero, ? to do in that case
-                                {
-                                    soldStock.setQuantity(0);
-                                }
+
+                            }
+                            else if ((boughtStock.getQuantity() - soldStock.getQuantity()) > 0)
+                            {
+                                profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                int leftBoughtStock = boughtStock.getQuantity() - soldStock.getQuantity();
+                                tempTransactions.Find(i => i == boughtStock).setQuantity(leftBoughtStock);
                             }
 
-                        }
-                        else if ((boughtStock.getQuantity() - soldStock.getQuantity()) > 0)
-                        {
-                            profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
                         }
                     }
                 }
             }
             //}
         }
+        private void stockExportFIFO2(List<Stock> allCompany)
+        {
+            /*Need to add the SavedStocks to this List*/
+            /*getting the company names*/
+            List<string> companies = new List<string>();
+            foreach(var transaction in allCompany)
+            {
+                if (!companies.Contains(transaction.getStockName()))
+                    companies.Add(transaction.getStockName());
+            }
+            /*getting the company names*/
 
+            Dictionary<Stock, int> transactionMap = new Dictionary<Stock, int>();
+            List<Stock> company = new List<Stock>();
+            bool allFinished = false;
+            while (!allFinished)
+            {
+                //removing the companies we done calculation
+                string companyName = companies[0];
+
+                /*Separating the Stocks based on CompanyNames*/
+                /*If we add it to the separate list we also save the original index,because we most likely to change it*/
+                for (int i = 0; i < allCompany.Count; i++)
+                {
+                    if(allCompany[i].getStockName()==companyName)
+                    {
+                        company.Add(allCompany[i]);
+                        transactionMap.Add(allCompany[i], i);
+                    }
+                }
+                /*Separating the Stocks based on CompanyNames*/
+                /*If we add it to the separate list we also save the original index,because we most likely to change it*/
+
+                //Megtaláljuk Hátulról a legelső eladást
+                Stock soldStock = null;
+                Stock boughtStock = null;
+                int totalCount = company.Count - 1;
+                int soldIndex = -1;
+                int boughtIndex = -1;
+                bool finished = false;
+                while (!finished)
+                {
+                    for (int i = totalCount; i >= 0; i--)
+                    {
+                        Regex quantityRegex1 = new Regex(@"Eladott");
+                        Regex quantityRegex2 = new Regex(@"Sold");
+                        Regex quantityRegex3 = new Regex(@"Sell");
+                        if (quantityRegex1.IsMatch(company[i].getTransactionType()) ||
+                                quantityRegex2.IsMatch(company[i].getTransactionType()) ||
+                                quantityRegex3.IsMatch(company[i].getTransactionType()))
+                        {
+                            soldStock = company[i];
+                            soldIndex = i;
+                            break;
+                        }
+                    }
+                    if(soldStock!=null)//ha újra belép akkor nem jó
+                    {
+                        for (int i = totalCount; i >= soldIndex+1; i--)
+                        {
+                            Regex quantityRegex1 = new Regex(@"Vásárolt");
+                            Regex quantityRegex2 = new Regex(@"Bought");
+                            Regex quantityRegex3 = new Regex(@"Buy");
+                            if (quantityRegex1.IsMatch(company[i].getTransactionType()) ||
+                                quantityRegex2.IsMatch(company[i].getTransactionType()) ||
+                                quantityRegex3.IsMatch(company[i].getTransactionType()))
+                            {
+                                boughtStock = company[i];
+                                boughtIndex = i;
+                                break;
+                            }
+                        }
+                        if(boughtStock!=null)//ha újra belép nem jó ?
+                        {
+                            double profit = 0;
+                            if ((boughtStock.getQuantity() - soldStock.getQuantity()) == 0)
+                            {
+                                profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                int index = transactionMap[soldStock];
+                                allCompany[index].setProfit(profit);
+                                totalCount = soldIndex--;
+                                boughtStock.setQuantity(0);
+                                soldStock.setQuantity(0);
+                            }
+                            else if ((boughtStock.getQuantity() - soldStock.getQuantity()) < 0)
+                            {
+                                //it's important to multiple it by the boughtStock,
+                                //because the soldStock quantity is higher than the bought
+                                profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * boughtStock.getQuantity();
+                                int leftQuantity = soldStock.getQuantity() - boughtStock.getQuantity();
+                                soldStock.setQuantity(leftQuantity);
+                                while (soldStock.getQuantity() != 0)
+                                {
+                                    /*this if means that, we "run" out of bought quantity, and the next Stock would be the SoldStock*/
+                                    if (boughtIndex - 1 != soldIndex)
+                                    {
+                                        for (int i = boughtIndex-1; i > soldIndex; i--)
+                                        {
+                                            Regex quantityRegex1 = new Regex(@"Vásárolt");
+                                            Regex quantityRegex2 = new Regex(@"Bought");
+                                            Regex quantityRegex3 = new Regex(@"Buy");
+                                            if (quantityRegex1.IsMatch(company[i].getTransactionType()) ||
+                                                quantityRegex2.IsMatch(company[i].getTransactionType()) ||
+                                                quantityRegex3.IsMatch(company[i].getTransactionType()))
+                                            {
+                                                boughtStock = company[i];
+                                                boughtIndex = i;
+                                                break;
+                                            }
+                                        }
+                                        /**
+                                         * We change the bought Stocks quantity because if we have other SOLD stocks we dont want it to count
+                                         * with the full quantity (There would be a mistake)
+                                         */
+                                        if (soldStock.getQuantity() > boughtStock.getQuantity())
+                                        {
+                                            leftQuantity = soldStock.getQuantity() - boughtStock.getQuantity();
+                                            profit += (soldStock.getStockPrice() - boughtStock.getStockPrice()) * boughtStock.getQuantity();
+                                        }
+                                        else if (boughtStock.getQuantity() > soldStock.getQuantity())
+                                        {
+                                            leftQuantity = 0;
+                                            profit += (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                            int leftBoughtQuantity = boughtStock.getQuantity() - soldStock.getQuantity();
+                                            boughtStock.setQuantity(leftBoughtQuantity);
+                                        }
+                                        else if (boughtStock.getQuantity() == soldStock.getQuantity())
+                                        {
+                                            leftQuantity = 0;
+                                            profit += (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                            boughtStock.setQuantity(0);
+                                        }
+                                        soldStock.setQuantity(leftQuantity);
+                                    }
+                                    else//we reached the sell transaction but the quantity is still not zero, ? to do in that case
+                                    {
+                                        soldStock.setQuantity(0);
+                                        totalCount = soldIndex--;
+                                    }
+                                }
+                            }
+                            else if ((boughtStock.getQuantity() - soldStock.getQuantity()) > 0)
+                            {
+                                profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
+                                int leftBoughtStock = boughtStock.getQuantity() - soldStock.getQuantity();
+                                company.Find(i => i == boughtStock).setQuantity(leftBoughtStock);
+                                totalCount = soldIndex--;
+                            }
+                        }
+                        else
+                        {
+                            finished=true;
+                        }
+                    }
+                    else
+                    {
+                        finished = true;
+                    }
+                }
+            }
+        }
         public string geImporterAccountNumber()
         {
             return importerAccountNumber;

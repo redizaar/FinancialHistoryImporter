@@ -8,20 +8,20 @@ namespace WpfApp1
 {
     public class Stock
     {
-        public string stockName { get; private set; }
-        public double stockPrice { get; private set; }
-        public int quantity { get; private set; }
-        public string transactionDate { get; private set; }
-        public string transactionType { get; private set; }
-        public string writeDate { get; private set; }
-        public int profit { get; private set; }
+        public string stockName { get;  set; }
+        public double stockPrice { get;  set; }
+        public int quantity { get;  set; }
+        public string transactionDate { get;  set; }
+        public string transactionType { get;  set; }
+        public string writeDate { get;  set; }
+        public double profit { get; set; }
         //for StockDataGrid
-        public string symbol { get; private set; }
-        public string date { get; private set; }
-        public double openPrice { get; private set; }
-        public double highPrice { get; private set; }
-        public double lowPrice { get; private set; }
-        public double closePrice { get; private set; }
+        public string symbol { get;  set; }
+        public string date { get;  set; }
+        public double openPrice { get;  set; }
+        public double highPrice { get;  set; }
+        public double lowPrice { get;  set; }
+        public double closePrice { get;  set; }
         //reading out from file Constructor
         public Stock(string _stockName,double _stockPrice,int _quantity,string _transactionDate,string _transactionType)
         {
@@ -32,7 +32,7 @@ namespace WpfApp1
             transactionType = _transactionType;
         }
         //writing to file Constructor
-        public Stock(string _writeDate, string _transactionDate,string _stockName,double _stockPrice, int _quantity, string _transactionType,int _profit)
+        public Stock(string _writeDate, string _transactionDate,string _stockName,double _stockPrice, int _quantity, string _transactionType,double _profit)
         {
             writeDate = _writeDate;
             stockName = _stockName;
@@ -56,7 +56,7 @@ namespace WpfApp1
         {
             return symbol;
         }
-        public int getProfit()
+        public double getProfit()
         {
             return profit;
         }
@@ -103,6 +103,10 @@ namespace WpfApp1
         public void setQuantity(int value)
         {
             quantity = value;
+        }
+        public void setProfit(double value)
+        {
+            profit = value;
         }
     }
 }

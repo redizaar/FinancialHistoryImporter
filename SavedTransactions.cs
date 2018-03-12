@@ -101,7 +101,7 @@ namespace WpfApp1
                 {
                     importer=ReadWorksheet.Cells[i, 12].Value.ToString();
                 }
-                savedTransactionsStock.Add(new Stock(writeoutDate, transactionDate, stockName, stockPrice, quantity, transactionType));
+                savedTransactionsStock.Add(new Stock(writeoutDate, transactionDate, stockName, stockPrice, quantity, transactionType,0));
                 i++;
             }
         }
