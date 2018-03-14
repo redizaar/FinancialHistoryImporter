@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace WpfApp1
 {
@@ -23,6 +24,9 @@ namespace WpfApp1
     public partial class Login_Page : Page
     {
         MainWindow mainWindow;
+        private DispatcherTimer timer1;
+        private static int tik;
+        private int failedLogins=0;
         public Login_Page(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
@@ -38,6 +42,7 @@ namespace WpfApp1
             sda.Fill(dtb);
             if(dtb.Rows.Count==1)
             {
+                failedLogins = 0;
                 User currentUser = new User();
                 currentUser.setUsername(usernameTextbox.Text.ToString());
                 currentUser.setAccountNumber(dtb.Rows[0][2].ToString());
@@ -46,6 +51,31 @@ namespace WpfApp1
                 //it's overwriten automatically in MainWindows constructor
                 mainWindow.setCurrentUser(currentUser);
                 Visibility = System.Windows.Visibility.Hidden;
+            }
+            else
+            {
+                MessageBox.Show("Wrong username or password!");
+                if (failedLogins > 3)
+                {
+                    timer1 = new DispatcherTimer();
+                    tik = 30;
+                    timer1.Interval = new TimeSpan(0, 0, 0, 1);
+                    timer1.Tick += new EventHandler(timer1_Tick);
+                    timer1.Start();
+                }
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            loginButton.IsEnabled = false;
+            loginButton.Content = tik;
+            if (tik > 0)
+                tik--;
+            else
+            {
+                loginButton.IsEnabled = true;
+                loginButton.Content = "Login";
             }
         }
 
