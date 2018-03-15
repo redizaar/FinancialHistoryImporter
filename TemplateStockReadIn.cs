@@ -749,6 +749,26 @@ namespace WpfApp1
         {
             return companyToTicker;
         }
+        public void setCompanyNameColumn(int value)
+        {
+            companyNameColumn = value;
+        }
+        public void setTransactionDateColumn(int value)
+        {
+            transactionDateColumn = value;
+        }
+        public void setPriceColumn(int value)
+        {
+            priceColumn = value;
+        }
+        public void setQuantityColumn(int value)
+        {
+            quantityColumn = value;
+        }
+        public void setTransactionTypeColumn(int value)
+        {
+            transactionTypeColumn = value;
+        }
         ~TemplateStockReadIn()
         {
             /*

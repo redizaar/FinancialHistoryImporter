@@ -43,21 +43,29 @@ namespace WpfApp1
                         else //userSpecified==true
                         {
                             TemplateBankReadIn templateBank = new TemplateBankReadIn(this, ReadWorkbook, ReadWorksheet, mainWindow, true);
-                            string startingRow = SpecifiedImport.getInstance(null,mainWindow).transactionsRowTextBox.Text.ToString();
-                            string dateColumn = SpecifiedImport.getInstance(null,mainWindow).dateColumnTextBox.Text.ToString();
-                            string commentColumn = SpecifiedImport.getInstance(null,mainWindow).commentColumnTextBox.Text.ToString();
-                            string accountNumberCB = SpecifiedImport.getInstance(null,mainWindow).accountNumberCB.SelectedItem.ToString();
-                            string transactionPriceCB = SpecifiedImport.getInstance(null,mainWindow).priceColumnCB.SelectedItem.ToString();
-                            string balanceCB = SpecifiedImport.getInstance(null,mainWindow).balanceColumnCB.SelectedItem.ToString();
-                            string balanceComboBocString = SpecifiedImport.getInstance(null, mainWindow).balanceColumnTextBox.Text.ToString();
+                            string startingRow = SpecifiedImportBank.getInstance(null,mainWindow).transactionsRowTextBox.Text.ToString();
+                            string dateColumn = SpecifiedImportBank.getInstance(null,mainWindow).dateColumnTextBox.Text.ToString();
+                            string commentColumn = SpecifiedImportBank.getInstance(null,mainWindow).commentColumnTextBox.Text.ToString();
+                            string accountNumberCB = SpecifiedImportBank.getInstance(null,mainWindow).accountNumberCB.SelectedItem.ToString();
+                            string transactionPriceCB = SpecifiedImportBank.getInstance(null,mainWindow).priceColumnCB.SelectedItem.ToString();
+                            string balanceCB = SpecifiedImportBank.getInstance(null,mainWindow).balanceColumnCB.SelectedItem.ToString();
+                            string balanceComboBocString = SpecifiedImportBank.getInstance(null, mainWindow).balanceColumnTextBox.Text.ToString();
                             templateBank.readOutUserspecifiedTransactions(startingRow, dateColumn, commentColumn, accountNumberCB, transactionPriceCB, balanceCB, balanceComboBocString);
                         }
                     }
                     else if(importType=="Stock")
                     {
-                        TemplateStockReadIn templateStock = new TemplateStockReadIn(this,path[i]);
-                        templateStock.analyzeStockTransactionFile();
-                        templateStock.readOutTransactions();
+                        if (!specifiedByUser)
+                        {
+                            TemplateStockReadIn templateStock = new TemplateStockReadIn(this, path[i]);
+                            templateStock.analyzeStockTransactionFile();
+                            templateStock.readOutTransactions();
+                        }
+                        else//userSpecified==true
+                        {
+                            TemplateStockReadIn templateStock = new TemplateStockReadIn(this, path[i]);
+                            string startingRowString = SpecifiedImportStock.getInstance(null, mainWindow).transactionsRowTextBox.ToString();
+                        }
                     }
                 }
                 excel.Application.Quit();

@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using WpfApp1.Animation;
+using WPFCustomMessageBox;
 
 namespace WpfApp1
 {
@@ -96,19 +97,37 @@ namespace WpfApp1
         }
         private void FileBrowser_Click(object sender, RoutedEventArgs e)
         {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".xls,.csv";
-            dlg.Filter = "Excel files (*.xls)|*.xls|Excel Files (*.xlsx)|*.xlsx|Excel Files (*.xlsm)|*.xlsm|CSV Files (*.csv)|*.csv";
-            dlg.Multiselect = true;
-            Nullable<bool> result = dlg.ShowDialog();
-            if (result == true)
+            MessageBoxResult messageBoxResult = CustomMessageBox.ShowYesNo(
+                        "\tPlease choose an import type!",
+                        "Import type alert!",
+                        "Automatized",
+                        "User specified");
+            if (messageBoxResult == MessageBoxResult.Yes || messageBoxResult == MessageBoxResult.No)
             {
-                List<string> fileAdresses = dlg.FileNames.ToList();
-                for (int i = 0; i < dlg.FileNames.ToList().Count; i++)
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                dlg.DefaultExt = ".xls,.csv";
+                dlg.Filter = "Excel files (*.xls)|*.xls|Excel Files (*.xlsx)|*.xlsx|Excel Files (*.xlsm)|*.xlsm|CSV Files (*.csv)|*.csv";
+                dlg.Multiselect = true;
+                Nullable<bool> result = dlg.ShowDialog();
+                if (result == true)
                 {
-                    check_if_csv(i, ref fileAdresses);
+                    List<string> fileAdresses = dlg.FileNames.ToList();
+                    for (int i = 0; i < dlg.FileNames.ToList().Count; i++)
+                    {
+                        check_if_csv(i, ref fileAdresses);
+                    }
+                    if (messageBoxResult == MessageBoxResult.Yes)
+                    {
+                        new ImportReadIn("Stock", fileAdresses, mainWindow, false);
+                    }
+                    else if(messageBoxResult == MessageBoxResult.No)
+                    {
+                        string[] fileName = dlg.FileNames.ToList()[0].Split('\\');
+                        int lastPartIndex = fileName.Length - 1; // to see which file the user immporting first
+                        SpecifiedImportStock.getInstance(fileAdresses, mainWindow).setCurrentFileLabel(fileName[lastPartIndex]);
+                        mainWindow.MainFrame.Content = SpecifiedImportStock.getInstance(fileAdresses, mainWindow);
+                    }
                 }
-                new ImportReadIn("Stock", fileAdresses, mainWindow, false);
             }
         }
         /**

@@ -131,6 +131,8 @@ namespace WpfApp1
         }
         private void addAtributesToTable(List<Stock> tableAttributes)
         {
+            //because sortDates in order runs from a different thread
+            //a different thread owns it
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 storedStockDataGrid.Items.Clear();

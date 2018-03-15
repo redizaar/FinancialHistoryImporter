@@ -23,6 +23,7 @@ namespace WpfApp1
         private string importerAccountNumber;
         public ExportTransactions(List<Transaction> transactions,MainWindow mainWindow,string currentFileName)
         {
+            this.mainWindow = mainWindow;
             for (int i = 0; i < transactions.Count; i++)
             {
                 string [] spaceSplitted=transactions[i].getTransactionDate().Split(' ');
@@ -31,7 +32,6 @@ namespace WpfApp1
                     dateString += spaceSplitted[j];
                 Console.WriteLine(dateString.Substring(0,11));
             }
-            this.mainWindow = mainWindow;
             MessageBox.Show("Exporting data from: " + currentFileName, "", MessageBoxButton.OK);
                                                     //BUT FIRST - check if the transaction is already exported or not 
             List<Transaction> neededTransactions = newTransactions(transactions);

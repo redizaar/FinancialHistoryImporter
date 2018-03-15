@@ -292,14 +292,14 @@ namespace WpfApp1
                             {
                                 string[] fileName = dlg.FileNames.ToList()[0].Split('\\');
                                 int lastPartIndex = fileName.Length - 1; // to see which file the user immporting first
-                                SpecifiedImport.getInstance(fileAdresses, importPageBank.mainWindow).setCurrentFileLabel(fileName[lastPartIndex]);
+                                SpecifiedImportBank.getInstance(fileAdresses, importPageBank.mainWindow).setCurrentFileLabel(fileName[lastPartIndex]);
                                 //fájl felismerés
                                 StoredColumnChecker columnChecker = new StoredColumnChecker();
                                 columnChecker.getDataTableFromSql(importPageBank.mainWindow);
                                 columnChecker.setAnalyseWorksheet(dlg.FileNames.ToList()[0]);
                                 columnChecker.setMostMatchesRow(columnChecker.findMostMatchingRow());
                                 columnChecker.setSpecifiedImportPageTextBoxes();
-                                importPageBank.mainWindow.MainFrame.Content = SpecifiedImport.getInstance(dlg.FileNames.ToList(), importPageBank.mainWindow);
+                                importPageBank.mainWindow.MainFrame.Content = SpecifiedImportBank.getInstance(dlg.FileNames.ToList(), importPageBank.mainWindow);
                             }
                         }
                     }

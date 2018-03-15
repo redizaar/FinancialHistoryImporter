@@ -262,25 +262,25 @@ namespace WpfApp1
         {
             if (mostMatchingRow != null)
             {
-                SpecifiedImport.getInstance(null, mainWindow).transactionsRowTextBox.Text = mostMatchingRow["TransStartRow"].ToString();
-                SpecifiedImport.getInstance(null, mainWindow).accountNumberChoice = accountNumberComboBox;
-                SpecifiedImport.getInstance(null, mainWindow).accountNumberTextBox.Text = mostMatchingRow["AccountNumberPos"].ToString();
-                SpecifiedImport.getInstance(null, mainWindow).dateColumnTextBox.Text = mostMatchingRow["DateColumn"].ToString();
-                SpecifiedImport.getInstance(null, mainWindow).priceColumnChoice = priceComboBox;
+                SpecifiedImportBank.getInstance(null, mainWindow).transactionsRowTextBox.Text = mostMatchingRow["TransStartRow"].ToString();
+                SpecifiedImportBank.getInstance(null, mainWindow).accountNumberChoice = accountNumberComboBox;
+                SpecifiedImportBank.getInstance(null, mainWindow).accountNumberTextBox.Text = mostMatchingRow["AccountNumberPos"].ToString();
+                SpecifiedImportBank.getInstance(null, mainWindow).dateColumnTextBox.Text = mostMatchingRow["DateColumn"].ToString();
+                SpecifiedImportBank.getInstance(null, mainWindow).priceColumnChoice = priceComboBox;
                 if (priceComboBox == "One column")
-                    SpecifiedImport.getInstance(null, mainWindow).priceColumnTextBox_1.Text = mostMatchingRow["PriceColumn"].ToString();
+                    SpecifiedImportBank.getInstance(null, mainWindow).priceColumnTextBox_1.Text = mostMatchingRow["PriceColumn"].ToString();
                 else
                 {
                     string[] splittedPriceColumns = mostMatchingRow["PriceColumn"].ToString().Split(',');
-                    SpecifiedImport.getInstance(null, mainWindow).priceColumnTextBox_1.Text = splittedPriceColumns[0];
-                    SpecifiedImport.getInstance(null, mainWindow).priceColumnTextBox_1.Text = splittedPriceColumns[1];
+                    SpecifiedImportBank.getInstance(null, mainWindow).priceColumnTextBox_1.Text = splittedPriceColumns[0];
+                    SpecifiedImportBank.getInstance(null, mainWindow).priceColumnTextBox_1.Text = splittedPriceColumns[1];
                 }
-                SpecifiedImport.getInstance(null, mainWindow).balanceColumnChoice = balanceComboBox;
+                SpecifiedImportBank.getInstance(null, mainWindow).balanceColumnChoice = balanceComboBox;
                 if (balanceComboBox != "None")
                 {
-                    SpecifiedImport.getInstance(null, mainWindow).balanceColumnTextBox.Text = mostMatchingRow["BalanceColumn"].ToString();
+                    SpecifiedImportBank.getInstance(null, mainWindow).balanceColumnTextBox.Text = mostMatchingRow["BalanceColumn"].ToString();
                 }
-                SpecifiedImport.getInstance(null, mainWindow).commentColumnTextBox.Text = mostMatchingRow["CommentColumn"].ToString();
+                SpecifiedImportBank.getInstance(null, mainWindow).commentColumnTextBox.Text = mostMatchingRow["CommentColumn"].ToString();
             }
         }
         public void setMostMatchesRow(DataRow value)

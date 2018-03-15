@@ -56,7 +56,7 @@
                 <Label x:Name="ownedSharesLabel" Content="Number by Code"  VerticalAlignment="Center" FontSize="15" FontFamily="Maiandra GD"/>
             </DockPanel>
             <DockPanel>
-                <Label Content="Chose a sell method :" Margin="208,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="Medium"/>
+                <Label Content="Choose an erarning method :" Margin="208,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="Medium"/>
                 <RadioButton x:Name="lifoMethodRB" Content="LIFO"   VerticalAlignment="Center" IsChecked="{Binding lifoMethod, Mode=TwoWay}"/>
                 <RadioButton x:Name="fifoMethodRB"  Content="FIFO"   VerticalAlignment="Center" IsChecked="{Binding fifoMethod, Mode=TwoWay}"/>
                 <RadioButton x:Name="customMethodRB"  Content="CUSTOM"   VerticalAlignment="Center" IsChecked="{Binding customMethod, Mode=TwoWay}"/>

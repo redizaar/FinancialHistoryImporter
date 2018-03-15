@@ -91,8 +91,11 @@
       <DependentUpon>Register_Page.xaml</DependentUpon>
     </Compile>
     <Compile Include="SavedTransactions.cs" />
-    <Compile Include="SpecifiedImport.xaml.cs">
-      <DependentUpon>SpecifiedImport.xaml</DependentUpon>
+    <Compile Include="SpecifiedImportBank.xaml.cs">
+      <DependentUpon>SpecifiedImportBank.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecifiedImportStock.xaml.cs">
+      <DependentUpon>SpecifiedImportStock.xaml</DependentUpon>
     </Compile>
     <Compile Include="Stock.cs" />
     <Compile Include="StockChart.xaml.cs">
@@ -139,7 +142,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SpecifiedImport.xaml">
+    <Page Include="SpecifiedImportBank.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecifiedImportStock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

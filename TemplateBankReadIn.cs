@@ -666,7 +666,7 @@ namespace WpfApp1
             //getting the account number fist
             string accountNumber="";
             int accountNumberColumn;
-            string accountNumberResult = SpecifiedImport.getInstance(null,mainWindow).accountNumberTextBox.Text.ToString();
+            string accountNumberResult = SpecifiedImportBank.getInstance(null,mainWindow).accountNumberTextBox.Text.ToString();
             if (accounNumberCB=="Column")
             {
                 try
@@ -769,7 +769,7 @@ namespace WpfApp1
             int spendingColumn=0;
             if (transactionPriceCB == "One column")
             {
-                string priceColumnString = SpecifiedImport.getInstance(null,mainWindow).priceColumnTextBox_1.Text.ToString();
+                string priceColumnString = SpecifiedImportBank.getInstance(null,mainWindow).priceColumnTextBox_1.Text.ToString();
                 try
                 {
                     priceColumn = int.Parse(priceColumnString);
@@ -782,7 +782,7 @@ namespace WpfApp1
             else if (transactionPriceCB == "Income,Spending")
             {
                 isOneColumn = false;
-                string incomeColumnString = SpecifiedImport.getInstance(null,mainWindow).priceColumnTextBox_1.Text.ToString();
+                string incomeColumnString = SpecifiedImportBank.getInstance(null,mainWindow).priceColumnTextBox_1.Text.ToString();
                 try
                 {
                     incomeColumn = int.Parse(incomeColumnString);
@@ -791,7 +791,7 @@ namespace WpfApp1
                 {
                     incomeColumn = ExcelColumnNameToNumber(incomeColumnString);
                 }
-                string spendingColumnString = SpecifiedImport.getInstance(null,mainWindow).priceColumnTextBox_2.Text.ToString();
+                string spendingColumnString = SpecifiedImportBank.getInstance(null,mainWindow).priceColumnTextBox_2.Text.ToString();
                 try
                 {
                     spendingColumn = int.Parse(spendingColumnString);
@@ -929,13 +929,13 @@ namespace WpfApp1
             bool accountTextBoxSheetName = false;
             bool isMultiplePriceColumns = false;
             bool haveBalanceColumn = true;
-            if(SpecifiedImport.getInstance(null,mainWindow).accountNumberCB.SelectedItem.ToString()=="Sheet name")
+            if(SpecifiedImportBank.getInstance(null,mainWindow).accountNumberCB.SelectedItem.ToString()=="Sheet name")
             {
                 accountTextBoxSheetName = true;
                  storedQuery= "Select * From [StoredColumns] where TransStartRow = '" + startingRow + "'" +
                 " AND AccountNumberPos = '" + "Sheet name" + "'" +
                 " AND DateColumn = '" + dateColumnTextBox + "'";
-                firstColumn = SpecifiedImport.getInstance(null, mainWindow).priceColumnTextBox_1.Text.ToString();
+                firstColumn = SpecifiedImportBank.getInstance(null, mainWindow).priceColumnTextBox_1.Text.ToString();
                 if (priceCheckBox=="One column")
                 {
                     storedQuery += " AND PriceColumn = '" + firstColumn + "'";
@@ -943,10 +943,10 @@ namespace WpfApp1
                 else if(priceCheckBox=="Income,Spending")
                 {
                     isMultiplePriceColumns = true;
-                    secondColumn = SpecifiedImport.getInstance(null, mainWindow).priceColumnTextBox_2.Text.ToString();
+                    secondColumn = SpecifiedImportBank.getInstance(null, mainWindow).priceColumnTextBox_2.Text.ToString();
                     storedQuery += " AND PriceColumn = '" + firstColumn + "," + secondColumn + "'";
                 }
-                string balanceColumnCB=SpecifiedImport.getInstance(null, mainWindow).balanceColumnCB.SelectedItem.ToString();
+                string balanceColumnCB=SpecifiedImportBank.getInstance(null, mainWindow).balanceColumnCB.SelectedItem.ToString();
                 if(balanceColumnCB=="Column")
                 {
                     storedQuery += " AND BalanceColumn = '" + balanceColumnTextBox + "'";
@@ -964,7 +964,7 @@ namespace WpfApp1
                 storedQuery = "Select * From [StoredColumns] where TransStartRow = '" + startingRow + "'" +
                " AND AccountNumberPos = '" + accountNumberTextBox + "'" +
                " AND DateColumn = '" + dateColumnTextBox + "'";
-                firstColumn = SpecifiedImport.getInstance(null, mainWindow).priceColumnTextBox_1.Text.ToString();
+                firstColumn = SpecifiedImportBank.getInstance(null, mainWindow).priceColumnTextBox_1.Text.ToString();
                 if (priceCheckBox == "One column")
                 {
                     storedQuery += " AND PriceColumn = '" + firstColumn + "'";
@@ -972,10 +972,10 @@ namespace WpfApp1
                 else if (priceCheckBox == "Income,Spending")
                 {
                     isMultiplePriceColumns = true;
-                    secondColumn = SpecifiedImport.getInstance(null, mainWindow).priceColumnTextBox_2.Text.ToString();
+                    secondColumn = SpecifiedImportBank.getInstance(null, mainWindow).priceColumnTextBox_2.Text.ToString();
                     storedQuery += " AND PriceColumn = '" + firstColumn + "," + secondColumn + "'";
                 }
-                string balanceColumnCB = SpecifiedImport.getInstance(null, mainWindow).balanceColumnCB.SelectedItem.ToString();
+                string balanceColumnCB = SpecifiedImportBank.getInstance(null, mainWindow).balanceColumnCB.SelectedItem.ToString();
                 if (balanceColumnCB == "Column")
                 {
                     storedQuery += " AND BalanceColumn = '" + balanceColumnTextBox + "'";
