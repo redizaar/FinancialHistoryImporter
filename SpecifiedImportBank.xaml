@@ -200,6 +200,9 @@
             <Setter Property="BorderThickness" Value="1,1,1,1"/>
             <Setter Property="BorderBrush" Value="black"/>
             <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="27"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="FontSize" Value="20"/>
         </Style>
     </Page.Resources>
@@ -212,30 +215,34 @@
             </DockPanel>
             <DockPanel VerticalAlignment="Center" Margin="0,7,0,0">
                 <Label Content="Szamlaszam: " Style="{StaticResource myLabelStyle}"/>
-                <ComboBox x:Name="accountNumberCB" Width="100" ItemsSource="{Binding accountNumberChoices}" SelectedItem="{Binding accountNumberChoice}" SelectionChanged="accountNumberCB_SelectionChanged" HorizontalAlignment="Left"/>
-                <TextBox  x:Name="accountNumberTextBox" Style="{StaticResource labelUnderBorderStyle}" HorizontalAlignment="Left"/>
+                <ComboBox x:Name="accountNumberCB" Width="100" ItemsSource="{Binding accountNumberChoices, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding accountNumberChoice}" SelectionChanged="accountNumberCB_SelectionChanged" HorizontalAlignment="Left"/>
+                <TextBox  x:Name="accountNumberTextBox" Style="{StaticResource labelUnderBorderStyle}" Width="50"/>
+                <DockPanel HorizontalAlignment="Right">
+                    <Label Content="Type : "  Style="{StaticResource myLabelStyle}"/>
+                    <ComboBox x:Name="storedTypesCB" Width="100" ItemsSource="{Binding bankChoices, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding bankChoice}" SelectionChanged="storedTypesCB_SelectionChanged"/>
+                </DockPanel>
             </DockPanel>
             <DockPanel VerticalAlignment="Center" Margin="0,7,0,0">
                 <Label Content="Datum oszlop: " Style="{StaticResource myLabelStyle}"/>
                 <TextBox x:Name="dateColumnTextBox" Style="{StaticResource labelUnderBorderStyle}" HorizontalAlignment="Left"/>
+                <TextBox x:Name="newBankTextbox" Width="120" Style="{StaticResource labelUnderBorderStyle}" HorizontalAlignment="Right" ToolTip="Enter the new Bank name here!"/>
             </DockPanel>
             <DockPanel VerticalAlignment="Center" Margin="0,7,0,0">
                 <Label Content="Osszeg oszlop: " Style="{StaticResource myLabelStyle}"/>
-                <ComboBox x:Name="priceColumnCB" ItemsSource="{Binding priceColumnChoices}" SelectedItem="{Binding priceColumnChoice}" SelectionChanged="priceColumnCB_SelectionChanged" HorizontalAlignment="Left"/>
+                <ComboBox x:Name="priceColumnCB" ItemsSource="{Binding priceColumnChoices, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding priceColumnChoice}" SelectionChanged="priceColumnCB_SelectionChanged" HorizontalAlignment="Left"/>
                 <TextBox x:Name="priceColumnTextBox_1" Style="{StaticResource labelUnderBorderStyle}" HorizontalAlignment="Left"/>
                 <TextBox x:Name="priceColumnTextBox_2" Style="{StaticResource labelUnderBorderStyle}" HorizontalAlignment="Left"/>
             </DockPanel>
             <DockPanel VerticalAlignment="Center" Margin="0,7,0,0">
                 <Label Content="Egyenleg oszlop: " Style="{StaticResource myLabelStyle}"/>
-                <ComboBox x:Name="balanceColumnCB" ItemsSource="{Binding balanceColumnChoices}" SelectedItem="{Binding balanceColumnChoice}" SelectionChanged="balanceColumnCB_SelectionChanged" HorizontalAlignment="Left"/>
+                <ComboBox x:Name="balanceColumnCB" ItemsSource="{Binding balanceColumnChoices, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding balanceColumnChoice}" SelectionChanged="balanceColumnCB_SelectionChanged" HorizontalAlignment="Left"/>
                 <TextBox x:Name="balanceColumnTextBox" Style="{StaticResource labelUnderBorderStyle}" HorizontalAlignment="Left"/>
             </DockPanel>
             <DockPanel VerticalAlignment="Center" Margin="0,7,0,0">
                 <Label Content="Komment oszlop: " Style="{StaticResource myLabelStyle}"/>
                 <TextBox x:Name="commentColumnTextBox" Style="{StaticResource labelUnderBorderStyle}" Width="100" HorizontalAlignment="Left" ToolTip="{Binding commentColumnHelp}"/>
             </DockPanel>
-            <Button  Content="Read in Transactions" Width="150" Height="45"  Style="{StaticResource importButtonStyle}" FontFamily="Maiandra GD" FontSize="15" Command="{Binding Path=importPushed}" HorizontalAlignment="Center"
-                     />
+            <Button x:Name="readInButton" Content="Read in Transactions" Width="150" Height="45"  Style="{StaticResource importButtonStyle}" FontFamily="Maiandra GD" FontSize="15" Command="{Binding Path=importPushed}" HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Page>

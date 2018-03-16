@@ -65,6 +65,12 @@ namespace WpfApp1
                         {
                             TemplateStockReadIn templateStock = new TemplateStockReadIn(this, path[i]);
                             string startingRowString = SpecifiedImportStock.getInstance(null, mainWindow).transactionsRowTextBox.ToString();
+                            string nameColumnString = SpecifiedImportStock.getInstance(null, mainWindow).stockNameColumnTextBox.ToString();
+                            string priceColumnString = SpecifiedImportStock.getInstance(null, mainWindow).priceColumnTextBox.ToString();
+                            string quantityColumnString = SpecifiedImportStock.getInstance(null, mainWindow).quantityColumnTextBox.ToString();
+                            string dateColumnString = SpecifiedImportStock.getInstance(null, mainWindow).dateColumnTextBox.ToString();
+                            string transactionTypeString = SpecifiedImportStock.getInstance(null, mainWindow).transactionTypeTextBox.ToString();
+                            templateStock.readOutUserspecifiedTransactions(startingRowString, nameColumnString, priceColumnString, quantityColumnString, dateColumnString, transactionTypeString);
                         }
                     }
                 }

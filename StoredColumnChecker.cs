@@ -21,6 +21,27 @@ namespace WpfApp1
         public System.Data.DataTable dtb;
         private MainWindow mainWindow;
         public StoredColumnChecker() { }
+        public void addDistinctBanksToCB()
+        {
+            foreach(var item in SpecifiedImportBank.getInstance(null,mainWindow).bankChoices.ToList())
+            {
+                if (item != "Add new Bank")
+                    SpecifiedImportBank.getInstance(null, mainWindow).bankChoices.Remove(item);
+            }
+            SqlConnection sqlConn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ImportFileData;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            sqlConn.Open();
+            string getEveryRow = "Select distinct BankName From [StoredColumns]";
+            SqlDataAdapter sda = new SqlDataAdapter(getEveryRow, sqlConn);
+            System.Data.DataTable datatable = new System.Data.DataTable();
+            sda.Fill(datatable);
+            if (datatable.Rows.Count > 0)
+            {
+                foreach (DataRow row in dtb.Rows)
+                {
+                   SpecifiedImportBank.getInstance(null,mainWindow).bankChoices.Add(row["BankName"].ToString());
+                }
+            }
+        }
         public void getDataTableFromSql(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
@@ -31,6 +52,7 @@ namespace WpfApp1
             System.Data.DataTable datatable = new System.Data.DataTable();
             sda.Fill(datatable);
             dtb = datatable;
+            SpecifiedImportBank.getInstance(null, mainWindow).setDataTableFromSql(datatable);
         }
         public void setAnalyseWorksheet(string filePath)
         {
@@ -80,7 +102,7 @@ namespace WpfApp1
                         dateColumn = ExcelColumnNameToNumber(dateColumnString);
                     }
                     int balanceColumn = -1;
-                    if (dateColumnString != "None")
+                    if (balanceColumnString != "None")
                     {
                         try
                         {
@@ -129,7 +151,7 @@ namespace WpfApp1
                             }
                             catch (Exception e)
                             {
-                                balanceColumn = ExcelColumnNameToNumber(accountNumberPosString);
+                                tempValue1 = ExcelColumnNameToNumber(accountNumberPosString);
                             }
                             accountNumberPos.Add(tempValue1);
                         }
@@ -262,6 +284,7 @@ namespace WpfApp1
         {
             if (mostMatchingRow != null)
             {
+                SpecifiedImportBank.getInstance(null, mainWindow).bankChoice = mostMatchingRow["BankName"].ToString();
                 SpecifiedImportBank.getInstance(null, mainWindow).transactionsRowTextBox.Text = mostMatchingRow["TransStartRow"].ToString();
                 SpecifiedImportBank.getInstance(null, mainWindow).accountNumberChoice = accountNumberComboBox;
                 SpecifiedImportBank.getInstance(null, mainWindow).accountNumberTextBox.Text = mostMatchingRow["AccountNumberPos"].ToString();
@@ -281,6 +304,10 @@ namespace WpfApp1
                     SpecifiedImportBank.getInstance(null, mainWindow).balanceColumnTextBox.Text = mostMatchingRow["BalanceColumn"].ToString();
                 }
                 SpecifiedImportBank.getInstance(null, mainWindow).commentColumnTextBox.Text = mostMatchingRow["CommentColumn"].ToString();
+            }
+            else//no data in sql
+            {
+                SpecifiedImportBank.getInstance(null, mainWindow).bankChoice = "Add new Bank";
             }
         }
         public void setMostMatchesRow(DataRow value)

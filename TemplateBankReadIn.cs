@@ -923,6 +923,7 @@ namespace WpfApp1
         {
             SqlConnection sqlConn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ImportFileData;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             sqlConn.Open();
+
             string storedQuery="";
             string firstColumn = ""; //price
             string secondColumn = ""; //price
@@ -993,8 +994,18 @@ namespace WpfApp1
             sda.Fill(dtb);
             if (dtb.Rows.Count==0)
             {
-                SqlCommand sqlCommand = new SqlCommand("insertNewColumns", sqlConn);//SQLQuery 5
+                SqlCommand sqlCommand = new SqlCommand("insertNewColumns3", sqlConn);//SQLQuery 8
                 sqlCommand.CommandType = CommandType.StoredProcedure;
+                if (SpecifiedImportBank.getInstance(null, mainWindow).storedTypesCB.SelectedItem.ToString() == "Add new Bank")
+                {
+                    string newBankName= SpecifiedImportBank.getInstance(null, mainWindow).newBankTextbox.Text.ToString();
+                    sqlCommand.Parameters.AddWithValue("@bankName", newBankName);
+                }
+                else
+                {
+                    string bankName = SpecifiedImportBank.getInstance(null, mainWindow).storedTypesCB.SelectedItem.ToString();
+                    sqlCommand.Parameters.AddWithValue("@bankName", bankName);
+                }
                 sqlCommand.Parameters.AddWithValue("@transStartRow", startingRow);
                 if (accountTextBoxSheetName)
                     sqlCommand.Parameters.AddWithValue("@accountNumberPos", "Sheet name");

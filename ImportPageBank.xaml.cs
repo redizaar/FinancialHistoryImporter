@@ -96,17 +96,23 @@ namespace WpfApp1
             usernameLabel.Content = currentUser.getUsername();
             foreach (var transactions in SavedTransactions.getSavedTransactionsBank())
             {
-                if(transactions.getAccountNumber().Equals(currentUser.getAccountNumber()))
+                string accountNumber = currentUser.getAccountNumber();
+                //it the user has more than 1 account number it separated by commas
+                string[] splittedAccountNumber = accountNumber.Split(',');
+                for (int i = 0; i < splittedAccountNumber.Length - 1; i++)
                 {
-                    numberOfTransactions++;
-                    latestImportDate = transactions.getWriteDate();//always overwrites it --- todo (more logic)
-                    if (transactions.getTransactionPrice() > 0)
+                    if (transactions.getAccountNumber()==splittedAccountNumber[i])
                     {
-                        totalIncome += transactions.getTransactionPrice();
-                    }
-                    else
-                    {
-                        totalSpendings += transactions.getTransactionPrice();
+                        numberOfTransactions++;
+                        latestImportDate = transactions.getWriteDate();
+                        if (transactions.getTransactionPrice() > 0)
+                        {
+                            totalIncome += transactions.getTransactionPrice();
+                        }
+                        else
+                        {
+                            totalSpendings += transactions.getTransactionPrice();
+                        }
                     }
                 }
             }
@@ -294,8 +300,10 @@ namespace WpfApp1
                                 int lastPartIndex = fileName.Length - 1; // to see which file the user immporting first
                                 SpecifiedImportBank.getInstance(fileAdresses, importPageBank.mainWindow).setCurrentFileLabel(fileName[lastPartIndex]);
                                 //fájl felismerés
+                                SpecifiedImportBank.getInstance(null, importPageBank.mainWindow).setBoxValuesToZero();
                                 StoredColumnChecker columnChecker = new StoredColumnChecker();
                                 columnChecker.getDataTableFromSql(importPageBank.mainWindow);
+                                columnChecker.addDistinctBanksToCB();
                                 columnChecker.setAnalyseWorksheet(dlg.FileNames.ToList()[0]);
                                 columnChecker.setMostMatchesRow(columnChecker.findMostMatchingRow());
                                 columnChecker.setSpecifiedImportPageTextBoxes();

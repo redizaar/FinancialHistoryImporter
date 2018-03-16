@@ -127,7 +127,7 @@ namespace WpfApp1
 
         public void readOutTransactions()
         {
-            if ((companyNameColumn != 0) || (transactionDateColumn != 0) || (priceColumn != 0))
+            if ((companyNameColumn != 0) && (transactionDateColumn != 0) && (priceColumn != 0))
             {
                 importedStocks = new List<Stock>();
                 int blank_cell_counter = 0;
@@ -708,6 +708,133 @@ namespace WpfApp1
                     return 0;
                 }
             }
+        }
+        public void readOutUserspecifiedTransactions(string startingRowString,string nameColumnString,string priceColumnString,
+            string quantityColumnString,string dateColumnString,string transactionTypeColumnString)
+        {
+            int startingRow = 0;
+            try
+            {
+                startingRow = int.Parse(startingRowString);
+            }
+            catch(Exception e)
+            {
+                startingRow = ExcelColumnNameToNumber(startingRowString);
+            }
+            int nameColumn = 0;
+            try
+            {
+                nameColumn = int.Parse(nameColumnString);
+            }
+            catch (Exception e)
+            {
+                nameColumn = ExcelColumnNameToNumber(nameColumnString);
+            }
+            int priceColumn = 0;
+            try
+            {
+                priceColumn = int.Parse(priceColumnString);
+            }
+            catch (Exception e)
+            {
+                priceColumn = ExcelColumnNameToNumber(priceColumnString);
+            }
+            int quantityColumn = 0;
+            try
+            {
+                quantityColumn = int.Parse(quantityColumnString);
+            }
+            catch (Exception e)
+            {
+                quantityColumn = ExcelColumnNameToNumber(quantityColumnString);
+            }
+            int dateColumn = 0;
+            try
+            {
+                dateColumn = int.Parse(dateColumnString);
+            }
+            catch (Exception e)
+            {
+                dateColumn = ExcelColumnNameToNumber(dateColumnString);
+            }
+            int transactionTypeColumn = 0;
+            try
+            {
+                transactionTypeColumn = int.Parse(transactionTypeColumnString);
+            }
+            catch (Exception e)
+            {
+                transactionTypeColumn = ExcelColumnNameToNumber(transactionTypeColumnString);
+            }
+            if ((nameColumn != 0) && (dateColumn != 0) && (priceColumn != 0))
+            {
+                importedStocks = new List<Stock>();
+                int blank_cell_counter = 0;
+                while (blank_cell_counter < 2)
+                {
+                    if ((stockWorksheet.Cells[startingRow, nameColumn].Value != null) &&
+                            (stockWorksheet.Cells[startingRow, dateColumn].Value != null) &&
+                            (stockWorksheet.Cells[startingRow, priceColumn].Value != null))
+                    {
+                        blank_cell_counter = 0;
+                        string companyName = stockWorksheet.Cells[startingRow, nameColumn].Value.ToString();
+                        string transactionDate = stockWorksheet.Cells[startingRow, dateColumn].Value.ToString();
+                        string transactionPriceString = stockWorksheet.Cells[startingRow, priceColumn].Value.ToString().Replace(',', '.');
+                        double transactionPrice = 0;
+                        try
+                        {
+                            transactionPrice = double.Parse(transactionPriceString, CultureInfo.InvariantCulture);
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+                        string transactionType = "-";
+                        string quantityString = "";
+                        int quantity = 1;
+                        if (stockWorksheet.Cells[startingRow, transactionTypeColumn].Value != null)
+                        {
+                            transactionType = stockWorksheet.Cells[startingRow, transactionTypeColumn].Value.ToString();
+                        }
+                        if (stockWorksheet.Cells[startingRow, quantityColumn].Value != null)
+                        {
+                            quantityString = stockWorksheet.Cells[startingRow, quantityColumn].Value.ToString();
+                            try
+                            {
+                                quantity = int.Parse(quantityString);
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
+                        }
+                        Stock stock = new Stock(companyName, transactionPrice, quantity, transactionDate, transactionType);
+                        importedStocks.Add(stock);
+                    }
+                    else
+                    {
+                        blank_cell_counter++;
+                    }
+                    startingRow++;
+                }
+                stockHandler.addTransactions(importedStocks);
+            }
+        }
+        public static int ExcelColumnNameToNumber(string columnName)
+        {
+            if (string.IsNullOrEmpty(columnName)) throw new ArgumentNullException("columnName");
+
+            columnName = columnName.ToUpperInvariant();
+
+            int sum = 0;
+
+            for (int i = 0; i < columnName.Length; i++)
+            {
+                sum *= 26;
+                sum += (columnName[i] - 'A' + 1);
+            }
+
+            return sum;
         }
         public void deleteTemporaryExcel()
         {

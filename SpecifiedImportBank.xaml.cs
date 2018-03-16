@@ -20,21 +20,72 @@ namespace WpfApp1
     /// <summary>
     /// Interaction logic for SpecifiedImport.xaml
     /// </summary>
-    public partial class SpecifiedImportBank : Page
+    public partial class SpecifiedImportBank : Page, INotifyPropertyChanged
     {
         private static SpecifiedImportBank instance;
         public MainWindow mainWindow;
         public static List<string> folderPath;
         public int numberofFile;
+        public System.Data.DataTable dataTable;
         //binding
         private ButtonCommands btnCommand;
         public List<string> accountNumberChoices { get; set; }
-        public string accountNumberChoice { get; set; }
+        public string _accountNumberChoice;
+        public string accountNumberChoice
+        {
+            get
+            {
+                return _accountNumberChoice;
+            }
+            set
+            {
+                _accountNumberChoice = value;
+                OnPropertyChanged("accountNumberChoice");
+            }
+        }
         public List<string> priceColumnChoices { get; set; }
-        public string priceColumnChoice { get; set; }
+        public string _priceColumnChoice;
+        public string priceColumnChoice
+        {
+            get
+            {
+                return _priceColumnChoice;
+            }
+            set
+            {
+                _priceColumnChoice = value;
+                OnPropertyChanged("priceColumnChoice");
+            }
+        }
         public List<string> balanceColumnChoices { get; set; }
-        public string balanceColumnChoice { get; set; }
+        public string _balanceColumnChoice;
+        public string balanceColumnChoice
+        {
+            get
+            {
+                return _balanceColumnChoice;
+            }
+            set
+            {
+                _balanceColumnChoice = value;
+                OnPropertyChanged("balanceColumnChoice");
+            }
+        }
         public string commentColumnHelp { get; set; }
+        public List<string> bankChoices { get; set; }
+        public string _bankChoice;
+        public string bankChoice
+        {
+            get
+            {
+                return _bankChoice;
+            }
+            set
+            {
+                _bankChoice = value;
+                OnPropertyChanged("bankChoice");
+            }
+        }
         public ButtonCommands importPushed
         {
             get
@@ -43,10 +94,19 @@ namespace WpfApp1
                 return btnCommand;
             }
         }
+        public void setDataTableFromSql(System.Data.DataTable _datatable)
+        {
+            dataTable = _datatable;
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if(PropertyChanged!=null)
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        public void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         //flags
         private bool accNum_Column;
@@ -64,6 +124,7 @@ namespace WpfApp1
             this.mainWindow = mainWindow;
             InitializeComponent();
             DataContext = this;
+
             commentColumnHelp = "Multiple comment columns can be separated by commas (i.e. A,B,C)!";
             string[] splitedFileName = folderPath[numberofFile].Split('\\');
             int lastSplitIndex = splitedFileName.Length - 1;
@@ -78,6 +139,8 @@ namespace WpfApp1
             balanceColumnChoices = new List<string>();
             balanceColumnChoices.Add("Column");
             balanceColumnChoices.Add("None");
+            bankChoices = new List<string>();
+            bankChoices.Add("Add new Bank");
             accountNumberTextBox.Visibility = Visibility.Hidden;
             priceColumnTextBox_1.Visibility = Visibility.Hidden;
             priceColumnTextBox_2.Visibility = Visibility.Hidden;
@@ -213,40 +276,111 @@ namespace WpfApp1
                 //todo
                 return true;
             }
-            private void set_box_values_to_zero()
-            {
-                specifiedImport.accountNumberCB.SelectedItem = null;
-                specifiedImport.priceColumnCB.SelectedItem = null;
-                specifiedImport.balanceColumnCB.SelectedItem = null;
-
-                specifiedImport.transactionsRowTextBox.Text = null;
-                specifiedImport.accountNumberTextBox.Text = null;
-                specifiedImport.dateColumnTextBox.Text = null;
-                specifiedImport.priceColumnTextBox_1.Text = null;
-                specifiedImport.priceColumnTextBox_2.Text = null;
-                specifiedImport.balanceColumnTextBox.Text = null;
-                specifiedImport.commentColumnTextBox.Text = null;
-            }
             public void Execute(object parameter)
             {
-                List<string> currentFile = new List<string>();
-                currentFile.Add(currentFileName);
-                new ImportReadIn("Bank", currentFile, specifiedImport.mainWindow, true);
-                if (SpecifiedImportBank.folderPath.Count < specifiedImport.getCurrentFileIndex())
+                if (specifiedImport.newBankTextbox.Text.ToString() != "")
                 {
-                    specifiedImport.incrementNumberofFile();
-                    string nextFileName = SpecifiedImportBank.folderPath[specifiedImport.getCurrentFileIndex()];
-                    string[] splittedFileName = nextFileName.Split('\\');
-                    int lastSplitIndex = nextFileName.Length - 1;
-                    specifiedImport.currentFileLabel.Content = "File: " + splittedFileName[lastSplitIndex];
-                    set_box_values_to_zero();
-                    StoredColumnChecker columnChecker = new StoredColumnChecker();
-                    columnChecker.getDataTableFromSql(specifiedImport.mainWindow);
-                    columnChecker.setAnalyseWorksheet(nextFileName);
-                    columnChecker.setMostMatchesRow(columnChecker.findMostMatchingRow());
-                    columnChecker.setSpecifiedImportPageTextBoxes();
+                    List<string> currentFile = new List<string>();
+                    currentFile.Add(currentFileName);
+                    new ImportReadIn("Bank", currentFile, specifiedImport.mainWindow, true);
+                    if (SpecifiedImportBank.folderPath.Count < specifiedImport.getCurrentFileIndex())
+                    {
+                        specifiedImport.incrementNumberofFile();
+                        string nextFileName = SpecifiedImportBank.folderPath[specifiedImport.getCurrentFileIndex()];
+                        string[] splittedFileName = nextFileName.Split('\\');
+                        int lastSplitIndex = nextFileName.Length - 1;
+                        specifiedImport.currentFileLabel.Content = "File: " + splittedFileName[lastSplitIndex];
+                        StoredColumnChecker columnChecker = new StoredColumnChecker();
+                        columnChecker.getDataTableFromSql(specifiedImport.mainWindow);
+                        columnChecker.addDistinctBanksToCB();
+                        columnChecker.setAnalyseWorksheet(nextFileName);
+                        columnChecker.setMostMatchesRow(columnChecker.findMostMatchingRow());
+                        columnChecker.setSpecifiedImportPageTextBoxes();
+                    }
+                }
+                else//didn't typed in the new banks name
+                {
+                    MessageBox.Show("Type in the new Bank name first, to the TextBox under the Type ComboBox!");
+                    specifiedImport.newBankTextbox.Focus();
                 }
             }
+        }
+
+        private void storedTypesCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (bankChoice == "Add new Bank")
+                newBankTextbox.Visibility = Visibility.Visible;
+            else
+            {
+                newBankTextbox.Visibility = Visibility.Hidden;
+                foreach(System.Data.DataRow record in dataTable.Rows)
+                {
+                    if(record["BankName"].ToString()==bankChoice)
+                    {
+                        transactionsRowTextBox.Text = record["TransStartRow"].ToString();
+                        string accountNumber = record["AccountNumberPos"].ToString();
+                        if (accountNumber != "Sheet name")
+                        {
+                            long size = sizeof(char) * accountNumber.Length;
+                            if (size > 1)
+                            {
+                                accountNumberChoice = "Cell";
+                            }
+                            else if (size == 1)
+                            {
+                                accountNumberChoice = "Column";
+                            }
+                            accountNumberTextBox.Text = accountNumber;
+                        }
+                        else
+                        {
+                            accountNumberChoice = "Sheet name";
+                        }
+                        dateColumnTextBox.Text = record["DateColumn"].ToString();
+                        string price = record["PriceColumn"].ToString();
+                        string[] splittedPrice = price.Split(',');
+                        if(splittedPrice.Length==1)
+                        {
+                            priceColumnChoice = "One column";
+                            priceColumnTextBox_1.Text = splittedPrice[0];
+                        }
+                        else
+                        {
+                            priceColumnChoice = "Income,Spending";
+                            priceColumnTextBox_1.Text = splittedPrice[0];
+                            priceColumnTextBox_2.Text = splittedPrice[1];
+                        }
+                        string balance = record["BalanceColumn"].ToString();
+                        if(balance=="None")
+                        {
+                            balanceColumnChoice = "None";
+                        }
+                        else
+                        {
+                            balanceColumnChoice = "Column";
+                            balanceColumnTextBox.Text = balance;
+                        }
+                        commentColumnTextBox.Text = record["CommentColumn"].ToString();
+                    }
+                }
+            }
+        }
+
+        internal void setBoxValuesToZero()
+        {
+            accountNumberCB.SelectedIndex = -1;
+            priceColumnCB.SelectedIndex = -1;
+            balanceColumnCB.SelectedIndex = -1;
+            storedTypesCB.SelectedIndex = -1;
+
+            transactionsRowTextBox.Text = "";
+            accountNumberTextBox.Text = "";
+            dateColumnTextBox.Text = "";
+            priceColumnTextBox_1.Text = "";
+            priceColumnTextBox_2.Text = "";
+            balanceColumnTextBox.Text = "";
+            commentColumnTextBox.Text = "";
+            newBankTextbox.Text = "";
         }
     }
 }

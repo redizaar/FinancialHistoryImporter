@@ -47,8 +47,6 @@ namespace WpfApp1
                 currentUser.setUsername(usernameTextbox.Text.ToString());
                 currentUser.setAccountNumber(dtb.Rows[0][2].ToString());
                 mainWindow.currentUserLabel.Content = currentUser.getUsername(); //notification label
-                //todo account-number
-                //it's overwriten automatically in MainWindows constructor
                 mainWindow.setCurrentUser(currentUser);
                 Visibility = System.Windows.Visibility.Hidden;
             }

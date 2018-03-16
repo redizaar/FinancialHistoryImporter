@@ -221,6 +221,7 @@ namespace WpfApp1
                     command.ExecuteNonQuery();
                     sqlConn.Close();
                 }
+                mainWindow.currentUser.setAccountNumber(storedAccountNumber += "," + accountNumber);
             }
             else if(storedAccountNumber=="-")
             {
@@ -232,6 +233,7 @@ namespace WpfApp1
                     command.ExecuteNonQuery();
                     sqlConn.Close();
                 }
+                mainWindow.currentUser.setAccountNumber(accountNumber);
             }
         }
         public ExportTransactions(List<Stock> transactions, MainWindow mainWindow,string currentFileName)
