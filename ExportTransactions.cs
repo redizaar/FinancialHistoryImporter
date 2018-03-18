@@ -242,16 +242,70 @@ namespace WpfApp1
             switch(earningMethod)
             {
                 case "FIFO":
-                    stockExportFIFO(transactions);
+                    stockExportFIFO(ref transactions);
                     break;
                 case "LIFO":
-                    stockExportLIFO(transactions);
+                    stockExportLIFO(ref transactions);
                     break;
                 case "CUSTOM":
                     break;
             }
+            MessageBox.Show("Exporting data from: " + currentFileName, "", MessageBoxButton.OK);
+            SavedTransactions.addToSavedTransactionsStock(transactions);//adding the freshyl imported transactions to the saved 
+            WriteWorkbook = excel.Workbooks.Open(@"C:\Users\Tocki\Desktop\Kimutatas.xlsx");
+            WriteWorksheet = WriteWorkbook.Worksheets[2];
+            string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
+            int row_number = 1;
+            while (WriteWorksheet.Cells[row_number, 1].Value != null)
+            {
+                row_number++; // get the current last row
+            }
+            foreach (var transaction in transactions)
+            {
+
+                WriteWorksheet.Cells[row_number, 1].Value = todaysDate;
+                WriteWorksheet.Cells[row_number, 2].Value = transaction.getTransactionDate();
+                WriteWorksheet.Cells[row_number, 3].Value = transaction.getStockName();
+                WriteWorksheet.Cells[row_number, 4].Value = transaction.getStockPrice();
+                Regex typeRegex1 = new Regex(@"Eladott");
+                Regex typeRegex2 = new Regex(@"Sold");
+                Regex typeRegex3 = new Regex(@"Sell");
+                Regex typeRegex4 = new Regex(@"Vásárolt");
+                Regex typeRegex5 = new Regex(@"Bought");
+                Regex typeRegex6 = new Regex(@"Buy");
+                if (typeRegex1.IsMatch(transaction.getTransactionType()) ||
+                    typeRegex2.IsMatch(transaction.getTransactionType()) ||
+                    typeRegex3.IsMatch(transaction.getTransactionType())) //Eladott
+                {
+                    WriteWorksheet.Cells[row_number, 5].Value = transaction.getQuantity();
+                    WriteWorksheet.Cells[row_number, 8].Value = transaction.getProfit();
+                    WriteWorksheet.Cells[row_number, 9].Value = earningMethod;
+                }
+                else if(typeRegex4.IsMatch(transaction.getTransactionType()) ||
+                    typeRegex5.IsMatch(transaction.getTransactionType()) ||
+                    typeRegex6.IsMatch(transaction.getTransactionType()))//Vásárolt
+                {
+                    WriteWorksheet.Cells[row_number, 6].Value = transaction.getQuantity();
+                    WriteWorksheet.Cells[row_number, 7].Value = transaction.getQuantity()*transaction.getStockPrice();
+                }
+                WriteWorksheet.Cells[row_number, 10].Value = mainWindow.getCurrentUser().getUsername();
+                row_number++;
+                Range line = (Range)WriteWorksheet.Rows[row_number];
+                line.Insert();
+            }
+            try
+            {
+                excel.ActiveWorkbook.Save();
+                excel.Workbooks.Close();
+                excel.Quit();
+            }
+            catch (Exception e)
+            {
+
+            }
+            //ImportPageBank.getInstance(mainWindow).setUserStatistics(mainWindow.getCurrentUser());
         }
-        private void stockExportFIFO(List<Stock> allCompany)
+        private void stockExportFIFO(ref List<Stock> allCompany)
         {
             /*Need to add the SavedStocks to this List*/
             /*Should save the left quantity in the Kimutatás excel to make it less time consuming*/
@@ -457,7 +511,7 @@ namespace WpfApp1
                 Console.WriteLine("Profit: " + test.getProfit());
             }
         }
-        private void stockExportLIFO(List<Stock> allCompany)
+        private void stockExportLIFO(ref List<Stock> allCompany)
         {
             /*Need to add the SavedStocks to this List*/
             /*Should save the left quantity in the Kimutatás excel to make it less time consuming*/
@@ -660,6 +714,7 @@ namespace WpfApp1
                 Console.WriteLine("Profit: " + test.getProfit());
             }
         }
+
         public string geImporterAccountNumber()
         {
             return importerAccountNumber;

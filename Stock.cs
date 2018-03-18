@@ -32,7 +32,7 @@ namespace WpfApp1
             transactionType = _transactionType;
         }
         //writing to file Constructor
-        public Stock(string _writeDate, string _transactionDate,string _stockName,double _stockPrice, int _quantity, string _transactionType,double _profit)
+        public Stock(string _writeDate, string _transactionDate,string _stockName,double _stockPrice, int _quantity, string _transactionType)
         {
             writeDate = _writeDate;
             stockName = _stockName;
@@ -40,7 +40,6 @@ namespace WpfApp1
             quantity = _quantity;
             transactionDate = _transactionDate;
             transactionType = _transactionType;
-            profit = _profit;
         }
         //sql Stock constructor
         public Stock(string _smybol,string _date,double _openPrice,double _highPrice,double _lowPrice,double _closePrice)

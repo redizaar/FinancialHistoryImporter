@@ -29,6 +29,7 @@ namespace WpfApp1
             while (ReadWorksheet.Cells[i, 1].Value != null)
             {
                 string writeoutDate = "";
+                string tempTransactionDate = "";
                 string transactionDate = "";
                 string balanceString = "";
                 int balance = 0;
@@ -38,7 +39,13 @@ namespace WpfApp1
                 string description = "";
 
                 writeoutDate = ReadWorksheet.Cells[i, 1].Value.ToString();
-                transactionDate = ReadWorksheet.Cells[i, 2].Value.ToString();
+                tempTransactionDate = ReadWorksheet.Cells[i, 2].Value.ToString();
+                string[] splittedDate = tempTransactionDate.Split(' ');
+                for(int j=0;j<splittedDate.Length-1; j++)
+                {
+                    if (j < 3)
+                        transactionDate += splittedDate[j];
+                }
                 balanceString = ReadWorksheet.Cells[i, 3].Value.ToString();
                 balance = int.Parse(balanceString);
                 if (ReadWorksheet.Cells[i, 7].Value != null)
@@ -81,11 +88,10 @@ namespace WpfApp1
                 writeoutDate = ReadWorksheet.Cells[i, 1].Value.ToString();
                 transactionDate = ReadWorksheet.Cells[i, 2].Value.ToString();
                 stockName = ReadWorksheet.Cells[i, 3].Value.ToString();
-                string quantityString="";
-
                 stockPriceString = ReadWorksheet.Cells[i, 4].Value.ToString().Replace(',','.');
                 stockPrice = double.Parse(stockPriceString, CultureInfo.InvariantCulture);
-                if(ReadWorksheet.Cells[i,4].Value!=null)//eladott
+                string quantityString = "";
+                if (ReadWorksheet.Cells[i,4].Value!=null)//eladott
                 {
                     quantityString = ReadWorksheet.Cells[i, 5].Value.ToString();
                     quantity=int.Parse(quantityString);
@@ -93,15 +99,27 @@ namespace WpfApp1
                 }
                 else if(ReadWorksheet.Cells[i,6].Value!=null)//vásárolt
                 {
-                    quantityString = ReadWorksheet.Cells[i, 5].Value.ToString();
+                    quantityString = ReadWorksheet.Cells[i, 6].Value.ToString();
                     quantity = int.Parse(quantityString);
                     transactionType = "Buy";
                 }
-                if(ReadWorksheet.Cells[i,12].Value!=null)
+                if(ReadWorksheet.Cells[i,10].Value!=null)
                 {
-                    importer=ReadWorksheet.Cells[i, 12].Value.ToString();
+                    importer=ReadWorksheet.Cells[i, 10].Value.ToString();
                 }
-                savedTransactionsStock.Add(new Stock(writeoutDate, transactionDate, stockName, stockPrice, quantity, transactionType,0));
+                Stock stock = new Stock(writeoutDate, transactionDate, stockName, stockPrice, quantity, transactionType);
+                if(stock.getTransactionType()=="Sell")
+                {
+                    string earningString = "";
+                    double earning = 0;
+                    if (ReadWorksheet.Cells[i,8].Value!=null)
+                    {
+                        earningString = ReadWorksheet.Cells[i, 8].Value.ToString().Replace(',', '.');
+                        earning = double.Parse(earningString, CultureInfo.InvariantCulture);
+                        stock.setProfit(earning);
+                    }
+                }
+                savedTransactionsStock.Add(stock);
                 i++;
             }
         }
@@ -118,6 +136,13 @@ namespace WpfApp1
             for(int i=0;i<newImported.Count;i++)
             {
                 savedTransactionsBank.Add(newImported[i]);
+            }
+        }
+        public static void addToSavedTransactionsStock(List<Stock> newImported)
+        {
+            for(int i=0;i<newImported.Count;i++)
+            {
+                savedTransactionsStock.Add(newImported[i]);
             }
         }
         public static SavedTransactions getInstance()
