@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,14 +16,12 @@ using System.Windows.Shapes;
 
 namespace WpfApp1
 {
-    /// <summary>
-    /// Interaction logic for DatabaseDataStock.xaml
-    /// </summary>
-    public partial class DatabaseDataStock : Page, INotifyPropertyChanged
+    public partial class DatabaseDataBank : Page, INotifyPropertyChanged
     {
-        private static DatabaseDataStock instance;
-        public List<Stock> _tableAttributes;
-        public List<Stock> tableAttributes
+        public List<string> categoryName { get; set; }
+        private static DatabaseDataBank instance;
+        public List<Transaction> _tableAttributes;
+        public List<Transaction> tableAttributes
         {
             get
             {
@@ -36,8 +33,6 @@ namespace WpfApp1
                 OnPropertyChanged("tableAttributes");
             }
         }
-        private MainWindow mainWindow;
-
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
@@ -48,26 +43,30 @@ namespace WpfApp1
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-        private DatabaseDataStock(MainWindow mainWindow)
+        private MainWindow mainWindow;
+        private DatabaseDataBank(MainWindow _mainWindow)
         {
-            this.mainWindow = mainWindow;
+            mainWindow = _mainWindow;
             DataContext = this;
             InitializeComponent();
         }
         public void setTableAttributes()
         {
-            //Binding is the reason for .ToList() , the count changed - it freezes it is not there
-            List<Stock> allTransactions = SavedTransactions.getSavedTransactionsStock();
-            List<Stock> reference = new List<Stock>();
+            List<Transaction> allTransactions = SavedTransactions.getSavedTransactionsBank();
+            List<Transaction> reference = new List<Transaction>();
             foreach (var tableAttribute in allTransactions)
             {
-                if (tableAttribute.getImporter() == mainWindow.getCurrentUser().getUsername())
+                string[] splittedAccountNumbers = mainWindow.getCurrentUser().getAccountNumber().Split(',');
+                for (int i = 0; i < splittedAccountNumbers.Length; i++)
                 {
-                    reference.Add(tableAttribute);
+                    if (tableAttribute.getAccountNumber() == splittedAccountNumbers[i])
+                    {
+                        reference.Add(tableAttribute);
+                        break;
+                    }
                 }
             }
-            Console.WriteLine(reference.Count);
-            tableAttributes = new List<Stock>(reference);
+            tableAttributes = new List<Transaction>(reference);
             if (tableAttributes != null)
             {
                 foreach (var transaction in tableAttributes)
@@ -83,19 +82,19 @@ namespace WpfApp1
                 }
             }
         }
-        public static DatabaseDataStock getInstance(MainWindow mainWindow)
+        public static DatabaseDataBank getInstance(MainWindow mainWindow)
         {
             if(instance==null)
             {
-                instance = new DatabaseDataStock(mainWindow);
+                instance = new DatabaseDataBank(mainWindow);
             }
             return instance;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            DatabaseDataBank.getInstance(mainWindow).setTableAttributes();
-            mainWindow.MainFrame.Content = DatabaseDataBank.getInstance(mainWindow);
+            DatabaseDataStock.getInstance(mainWindow).setTableAttributes();
+            mainWindow.MainFrame.Content = DatabaseDataStock.getInstance(mainWindow);
         }
     }
 }

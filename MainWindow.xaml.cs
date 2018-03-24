@@ -17,7 +17,6 @@ namespace WpfApp1
         private bool newImport = false;
         public User currentUser;
         private string accountNumber= " ";
-        public Stopwatch webStockStopwatch=new Stopwatch();
         public MainWindow()
         {
             DataContext = this;
@@ -89,7 +88,7 @@ namespace WpfApp1
         {
             //reading in saved transactions
             SavedTransactions.getInstance().readOutSavedBankTransactions();
-            //SavedTransactions.getInstance().readOutStockSavedTransactions();
+            SavedTransactions.getInstance().readOutStockSavedTransactions();
         }
         public void getTransactions(string bankName,List<string> folderAddress)
         {
@@ -139,33 +138,17 @@ namespace WpfApp1
             }
            else if(buttonContent.Equals("Database"))
            {
-                TransactionMain.getInstance(mainWindow).setTableAttributes();
-                mainWindow.MainFrame.Content=TransactionMain.getInstance(mainWindow);
+                DatabaseDataBank.getInstance(mainWindow).setTableAttributes();
+                mainWindow.MainFrame.Content=DatabaseDataBank.getInstance(mainWindow);
                 mainWindow.tableMenuTop.Visibility = System.Windows.Visibility.Visible;
                 mainWindow.tableDock.Background = new SolidColorBrush(Color.FromRgb(198, 61, 15));
            }
            else if(buttonContent.Equals("stockMarketData"))
             {
-                if (mainWindow.webStockStopwatch.Elapsed == TimeSpan.FromMilliseconds(0))
-                {
-                    mainWindow.webStockStopwatch.Start();
-                    StockChart stockChart = new StockChart(mainWindow);
-                    mainWindow.MainFrame.Content = stockChart;
-                    mainWindow.portfolioMenuTop.Visibility = System.Windows.Visibility.Visible;
-                    mainWindow.stockChartDock.Background = new SolidColorBrush(Color.FromRgb(198, 61, 15));
-                }
-                else
-                {
-                    if (mainWindow.webStockStopwatch.Elapsed <= TimeSpan.FromMinutes(0.2))
-                    {
-                        MessageBox.Show("Please wait for " + (TimeSpan.FromMinutes(0.2) - mainWindow.webStockStopwatch.Elapsed) + " seconds!");
-                    }
-                    else
-                    {
-                        mainWindow.webStockStopwatch.Stop();
-                        mainWindow.webStockStopwatch.Reset();
-                    }
-                }
+                StockChart stockChart = new StockChart(mainWindow);
+                mainWindow.MainFrame.Content = stockChart;
+                mainWindow.portfolioMenuTop.Visibility = System.Windows.Visibility.Visible;
+                mainWindow.stockChartDock.Background = new SolidColorBrush(Color.FromRgb(198, 61, 15));
             }
            else if(buttonContent.Equals("Exit"))
            {

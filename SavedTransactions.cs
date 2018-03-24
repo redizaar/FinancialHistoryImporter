@@ -38,7 +38,7 @@ namespace WpfApp1
                 int transactionPrice = 0;
                 string accountNumber = "";
                 string description = "";
-
+                string earningMethod = "-";
                 writeoutDate = ReadWorksheet.Cells[i, 1].Value.ToString();
                 tempTransactionDate = ReadWorksheet.Cells[i, 2].Value.ToString();
                 string[] splittedDate = tempTransactionDate.Split(' ');
@@ -75,8 +75,6 @@ namespace WpfApp1
                 savedTransactionsBank.Add(new Transaction(writeoutDate, transactionDate, balance, transactionPrice, accountNumber, description));
                 i++;
             }
-            excel.Workbooks.Close();
-            excel.Quit();
         }
         public void readOutStockSavedTransactions()
         {
@@ -89,10 +87,11 @@ namespace WpfApp1
                 string transactionDate = "";
                 string stockPriceString = "";
                 double stockPrice = 0;
-                int quantity = 0;
+                int originalQuantity = 0;
                 string transactionType = "";
                 string importer = "";
-
+                string currentQuantity = "";
+                string currentAndOriginal = "";
                 writeoutDate = ReadWorksheet.Cells[i, 1].Value.ToString();
                 transactionDate = ReadWorksheet.Cells[i, 2].Value.ToString();
                 stockName = ReadWorksheet.Cells[i, 3].Value.ToString();
@@ -102,34 +101,48 @@ namespace WpfApp1
                 if (ReadWorksheet.Cells[i,5].Value!=null)//eladott
                 {
                     quantityString = ReadWorksheet.Cells[i, 5].Value.ToString();
-                    quantity=int.Parse(quantityString);
+                    originalQuantity=int.Parse(quantityString);
                     transactionType = "Sell";
                 }
                 else if(ReadWorksheet.Cells[i,6].Value!=null)//vásárolt
                 {
                     quantityString = ReadWorksheet.Cells[i, 6].Value.ToString();
-                    quantity = int.Parse(quantityString);
+                    originalQuantity = int.Parse(quantityString);
                     transactionType = "Buy";
                 }
-                if(ReadWorksheet.Cells[i,10].Value!=null)
+                if (ReadWorksheet.Cells[i, 7].Value != null) //jelenlegi darab
                 {
-                    importer=ReadWorksheet.Cells[i, 10].Value.ToString();
+                    currentQuantity = ReadWorksheet.Cells[i, 7].Value.ToString();
                 }
-                Stock stock = new Stock(writeoutDate, transactionDate, stockName, stockPrice, quantity, transactionType,importer);
+                currentAndOriginal = originalQuantity.ToString() + " (" + currentQuantity + ")";
+                if (ReadWorksheet.Cells[i,11].Value!=null)
+                {
+                    importer=ReadWorksheet.Cells[i, 11].Value.ToString();
+                }
+                Stock stock = new Stock(writeoutDate, transactionDate, stockName, stockPrice, originalQuantity, transactionType,importer);
                 if(stock.getTransactionType()=="Sell")
                 {
-                    string earningString = "";
-                    double earning = 0;
-                    if (ReadWorksheet.Cells[i,8].Value!=null)
+                    string profitString = "";
+                    string earningMethod = "-";
+                    double profit = 0;
+                    if (ReadWorksheet.Cells[i,9].Value!=null)
                     {
-                        earningString = ReadWorksheet.Cells[i, 8].Value.ToString().Replace(',', '.');
-                        earning = double.Parse(earningString, CultureInfo.InvariantCulture);
-                        stock.setProfit(earning);
+                        profitString = ReadWorksheet.Cells[i, 9].Value.ToString().Replace(',', '.');
+                        profit = double.Parse(profitString, CultureInfo.InvariantCulture);
+                        stock.setProfit(profit);
                     }
+                    if(ReadWorksheet.Cells[i,9].Value!=null)
+                    {
+                        earningMethod = ReadWorksheet.Cells[i, 10].Value.ToString();
+                    }
+                    stock.setEarningMethod(earningMethod);
                 }
+                stock.setOriginalAndSellQuantity(currentAndOriginal);
                 savedTransactionsStock.Add(stock);
                 i++;
             }
+            excel.Workbooks.Close();
+            excel.Quit();
         }
         public static List<Transaction> getSavedTransactionsBank()
         {
@@ -141,14 +154,24 @@ namespace WpfApp1
         }
         public static void addToSavedTransactionsBank(List<Transaction> newImported)
         {
-            for(int i=0;i<newImported.Count;i++)
+            string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
+            for (int i = 0; i < newImported.Count; i++)
+            {
+                newImported[i].setWriteDate(todaysDate);
+            }
+            for (int i=0;i<newImported.Count;i++)
             {
                 savedTransactionsBank.Add(newImported[i]);
             }
         }
         public static void addToSavedTransactionsStock(List<Stock> newImported)
         {
-            for(int i=0;i<newImported.Count;i++)
+            string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
+            for (int i = 0; i < newImported.Count; i++)
+            {
+                newImported[i].setWriteDate(todaysDate);
+            }
+            for (int i=0;i<newImported.Count;i++)
             {
                 savedTransactionsStock.Add(newImported[i]);
             }
