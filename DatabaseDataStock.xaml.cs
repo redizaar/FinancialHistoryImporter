@@ -66,7 +66,6 @@ namespace WpfApp1
                     reference.Add(tableAttribute);
                 }
             }
-            Console.WriteLine(reference.Count);
             tableAttributes = new List<Stock>(reference);
             if (tableAttributes != null)
             {
@@ -90,12 +89,6 @@ namespace WpfApp1
                 instance = new DatabaseDataStock(mainWindow);
             }
             return instance;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            DatabaseDataBank.getInstance(mainWindow).setTableAttributes();
-            mainWindow.MainFrame.Content = DatabaseDataBank.getInstance(mainWindow);
         }
     }
 }
