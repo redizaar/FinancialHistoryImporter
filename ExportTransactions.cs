@@ -69,6 +69,7 @@ namespace WpfApp1
                     }
                     WriteWorksheet.Cells[row_number, 14].Value = transctn.getTransactionDescription();
                     WriteWorksheet.Cells[row_number, 16].Value = transctn.getAccountNumber();
+                    WriteWorksheet.Cells[row_number, 17].Value = transctn.getBankname();
                     row_number++;
                     Range line = (Range)WriteWorksheet.Rows[row_number];
                     line.Insert();
@@ -257,71 +258,75 @@ namespace WpfApp1
                     stockExportLIFO(ref transactions);
                     break;
                 case "CUSTOM":
+                    mainWindow.MainFrame.Content = new CustomStockExportPage(mainWindow, transactions);
                     break;
             }
-            //for DataBaseDataStock
-            for (int i = 0; i < transactions.Count; i++)
+            if (earningMethod == "FIFO" || earningMethod == "LIFO")
             {
-                string value = quantities[i] + " (" + transactions[i].getQuantity() + ")";
-                transactions[i].setOriginalAndSellQuantity(value);
-                transactions[i].setImporter(mainWindow.getCurrentUser().getUsername());
-                transactions[i].setEarningMethod(earningMethod);
-            }
-            MessageBox.Show("Exporting data from: " + currentFileName, "", MessageBoxButton.OK);
-            SavedTransactions.addToSavedTransactionsStock(transactions);//adding the freshyl imported transactions to the saved 
-            WriteWorkbook = excel.Workbooks.Open(@"C:\Users\Tocki\Desktop\Kimutatas.xlsx");
-            WriteWorksheet = WriteWorkbook.Worksheets[2];
-            string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
-            int row_number = 1;
-            while (WriteWorksheet.Cells[row_number, 1].Value != null)
-            {
-                row_number++; // get the current last row
-            }
-            for(int i= 0;i<transactions.Count;i++)
-            {
-
-                WriteWorksheet.Cells[row_number, 1].Value = todaysDate;
-                WriteWorksheet.Cells[row_number, 2].Value = transactions[i].getTransactionDate();
-                WriteWorksheet.Cells[row_number, 3].Value = transactions[i].getStockName();
-                WriteWorksheet.Cells[row_number, 4].Value = transactions[i].getStockPrice();
-                Regex typeRegex1 = new Regex(@"Eladott");
-                Regex typeRegex2 = new Regex(@"Sold");
-                Regex typeRegex3 = new Regex(@"Sell");
-                Regex typeRegex4 = new Regex(@"Vásárolt");
-                Regex typeRegex5 = new Regex(@"Bought");
-                Regex typeRegex6 = new Regex(@"Buy");
-                if (typeRegex1.IsMatch(transactions[i].getTransactionType()) ||
-                    typeRegex2.IsMatch(transactions[i].getTransactionType()) ||
-                    typeRegex3.IsMatch(transactions[i].getTransactionType())) //Eladott
+                //for DataBaseDataStock
+                for (int i = 0; i < transactions.Count; i++)
                 {
-                    WriteWorksheet.Cells[row_number, 5].Value = quantities[i];                                    //!! eredeti quantity
-                    WriteWorksheet.Cells[row_number, 9].Value = transactions[i].getProfit();
-                    WriteWorksheet.Cells[row_number, 10].Value = earningMethod;
+                    string value = quantities[i] + " (" + transactions[i].getQuantity() + ")";
+                    transactions[i].setOriginalAndSellQuantity(value);
+                    transactions[i].setImporter(mainWindow.getCurrentUser().getUsername());
+                    transactions[i].setEarningMethod(earningMethod);
                 }
-                else if(typeRegex4.IsMatch(transactions[i].getTransactionType()) ||
-                    typeRegex5.IsMatch(transactions[i].getTransactionType()) ||
-                    typeRegex6.IsMatch(transactions[i].getTransactionType()))//Vásárolt
+                MessageBox.Show("Exporting data from: " + currentFileName, "", MessageBoxButton.OK);
+                SavedTransactions.addToSavedTransactionsStock(transactions);//adding the freshyl imported transactions to the saved 
+                WriteWorkbook = excel.Workbooks.Open(@"C:\Users\Tocki\Desktop\Kimutatas.xlsx");
+                WriteWorksheet = WriteWorkbook.Worksheets[2];
+                string todaysDate = DateTime.Now.ToString("yyyy-MM-dd");
+                int row_number = 1;
+                while (WriteWorksheet.Cells[row_number, 1].Value != null)
                 {
-                    WriteWorksheet.Cells[row_number, 6].Value = quantities[i];                                    //! eredeti quantity
-                    WriteWorksheet.Cells[row_number, 8].Value =quantities[i]*transactions[i].getStockPrice();     //!! eredeti quantity
+                    row_number++; // get the current last row
                 }
-                WriteWorksheet.Cells[row_number, 7].Value = transactions[i].getQuantity();                       //!! mostani quantity
-                WriteWorksheet.Cells[row_number, 11].Value = mainWindow.getCurrentUser().getUsername();
-                row_number++;
-                Range line = (Range)WriteWorksheet.Rows[row_number];
-                line.Insert();
-            }
-            try
-            {
-                excel.ActiveWorkbook.Save();
-                excel.Workbooks.Close();
-                excel.Quit();
-            }
-            catch (Exception e)
-            {
+                for (int i = 0; i < transactions.Count; i++)
+                {
 
+                    WriteWorksheet.Cells[row_number, 1].Value = todaysDate;
+                    WriteWorksheet.Cells[row_number, 2].Value = transactions[i].getTransactionDate();
+                    WriteWorksheet.Cells[row_number, 3].Value = transactions[i].getStockName();
+                    WriteWorksheet.Cells[row_number, 4].Value = transactions[i].getStockPrice();
+                    Regex typeRegex1 = new Regex(@"Eladott");
+                    Regex typeRegex2 = new Regex(@"Sold");
+                    Regex typeRegex3 = new Regex(@"Sell");
+                    Regex typeRegex4 = new Regex(@"Vásárolt");
+                    Regex typeRegex5 = new Regex(@"Bought");
+                    Regex typeRegex6 = new Regex(@"Buy");
+                    if (typeRegex1.IsMatch(transactions[i].getTransactionType()) ||
+                        typeRegex2.IsMatch(transactions[i].getTransactionType()) ||
+                        typeRegex3.IsMatch(transactions[i].getTransactionType())) //Eladott
+                    {
+                        WriteWorksheet.Cells[row_number, 5].Value = quantities[i];                                    //!! eredeti quantity
+                        WriteWorksheet.Cells[row_number, 9].Value = transactions[i].getProfit();
+                        WriteWorksheet.Cells[row_number, 10].Value = earningMethod;
+                    }
+                    else if (typeRegex4.IsMatch(transactions[i].getTransactionType()) ||
+                        typeRegex5.IsMatch(transactions[i].getTransactionType()) ||
+                        typeRegex6.IsMatch(transactions[i].getTransactionType()))//Vásárolt
+                    {
+                        WriteWorksheet.Cells[row_number, 6].Value = quantities[i];                                    //! eredeti quantity
+                        WriteWorksheet.Cells[row_number, 8].Value = quantities[i] * transactions[i].getStockPrice();     //!! eredeti quantity
+                    }
+                    WriteWorksheet.Cells[row_number, 7].Value = transactions[i].getQuantity();                       //!! mostani quantity
+                    WriteWorksheet.Cells[row_number, 11].Value = mainWindow.getCurrentUser().getUsername();
+                    row_number++;
+                    Range line = (Range)WriteWorksheet.Rows[row_number];
+                    line.Insert();
+                }
+                try
+                {
+                    excel.ActiveWorkbook.Save();
+                    excel.Workbooks.Close();
+                    excel.Quit();
+                }
+                catch (Exception e)
+                {
+
+                }
+                ImportPageStock.getInstance(mainWindow).setUserStatistics(mainWindow.getCurrentUser());
             }
-            //ImportPageBank.getInstance(mainWindow).setUserStatistics(mainWindow.getCurrentUser());
         }
         private void stockExportFIFO(ref List<Stock> allCompany)
         {
@@ -479,7 +484,7 @@ namespace WpfApp1
                                                 }
                                                 else
                                                 {
-                                                    finished = true;
+                                                    boughtIndex--;
                                                 }
                                             }
                                             else//we reached the sell transaction but the quantity is still not zero, ? to do in that case
@@ -497,6 +502,8 @@ namespace WpfApp1
                                         company.Find(i => i == boughtStock).setQuantity(leftBoughtStock);
                                         int index = transactionMap[soldStock];
                                         allCompany[index].setProfit(profit);
+                                        soldStock.setQuantity(0);
+                                        boughtStock.setQuantity(leftBoughtStock);
                                     }
                                 }
                                 else
@@ -504,18 +511,24 @@ namespace WpfApp1
                                     finished = true;
                                     distinctCompanyNames.RemoveAt(0);
                                 }
+                                if (boughtStock.getQuantity() > 0)
+                                    allCompany.Find(i => i == boughtStock).setQuantity(boughtStock.getQuantity());
                             }
                             else
                             {
                                 finished = true;
                                 distinctCompanyNames.RemoveAt(0);
                             }
+                            if (boughtStock.getQuantity() > 0)
+                                allCompany.Find(i => i == boughtStock).setQuantity(boughtStock.getQuantity());
                         }
                         else
                         {
                             finished = true;
                             distinctCompanyNames.RemoveAt(0);
                         }
+                        if (boughtStock.getQuantity() > 0)
+                            allCompany.Find(i => i == boughtStock).setQuantity(boughtStock.getQuantity());
                     }
                 }
                 else
@@ -644,9 +657,12 @@ namespace WpfApp1
                                                         quantityRegex2.IsMatch(company[i].getTransactionType()) ||
                                                         quantityRegex3.IsMatch(company[i].getTransactionType()))
                                                     {
-                                                        boughtStock = company[i];
-                                                        boughtIndex = i;
-                                                        break;
+                                                        if (company[i].getQuantity() > 0)
+                                                        {
+                                                            boughtStock = company[i];
+                                                            boughtIndex = i;
+                                                            break;
+                                                        }
                                                     }
                                                 }
                                                 /**
@@ -659,6 +675,7 @@ namespace WpfApp1
                                                     {
                                                         leftQuantity = soldStock.getQuantity() - boughtStock.getQuantity();
                                                         profit += (soldStock.getStockPrice() - boughtStock.getStockPrice()) * boughtStock.getQuantity();
+                                                        boughtStock.setQuantity(0);
                                                     }
                                                     else if (boughtStock.getQuantity() > soldStock.getQuantity())
                                                     {
@@ -677,7 +694,7 @@ namespace WpfApp1
                                                 }
                                                 else
                                                 {
-                                                    finished = true;
+                                                    boughtIndex++;
                                                 }
                                             }
                                             else//we reached the sell transaction but the quantity is still not zero, ? to do in that case
@@ -688,11 +705,12 @@ namespace WpfApp1
                                         int index = transactionMap[soldStock];
                                         allCompany[index].setProfit(profit);
                                     }
-                                    else if ((boughtStock.getQuantity() - soldStock.getQuantity()) > 0)
+                                    else if ((boughtStock.getQuantity() > soldStock.getQuantity()))
                                     {
                                         profit = (soldStock.getStockPrice() - boughtStock.getStockPrice()) * soldStock.getQuantity();
                                         int leftBoughtStock = boughtStock.getQuantity() - soldStock.getQuantity();
                                         company.Find(i => i == boughtStock).setQuantity(leftBoughtStock);
+                                        soldStock.setQuantity(0);
                                         int index = transactionMap[soldStock];
                                         allCompany[index].setProfit(profit);
                                     }
@@ -701,18 +719,24 @@ namespace WpfApp1
                                 {
                                     finished = true;
                                     distinctCompanyNames.RemoveAt(0);
+                                    if (boughtStock.getQuantity() > 0)
+                                        allCompany.Find(i => i == boughtStock).setQuantity(boughtStock.getQuantity());
                                 }
                             }
                             else
                             {
                                 finished = true;
                                 distinctCompanyNames.RemoveAt(0);
+                                if (boughtStock.getQuantity() > 0)
+                                    allCompany.Find(i => i == boughtStock).setQuantity(boughtStock.getQuantity());
                             }
                         }
                         else
                         {
                             finished = true;
                             distinctCompanyNames.RemoveAt(0);
+                            if (boughtStock.getQuantity() > 0)
+                                allCompany.Find(i => i == boughtStock).setQuantity(boughtStock.getQuantity());
                         }
                     }
                 }

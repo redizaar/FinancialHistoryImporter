@@ -39,7 +39,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <DockPanel Margin="0,0,0,0" x:Name="importDock">
+                        <DockPanel  x:Name="importDock">
                             <Expander  IsExpanded="{Binding SelectedExpander, Mode=TwoWay, Converter={StaticResource ExpanderToBooleanConverter}, ConverterParameter=1}">
                                 <Expander.Header>
                                     <BulletDecorator>
@@ -63,7 +63,7 @@
                                 </WrapPanel>
                             </Expander>
                         </DockPanel>
-                        <DockPanel Margin="0,0,0,0" x:Name="tableDock">
+                        <DockPanel x:Name="tableDock">
                             <Expander  IsExpanded="{Binding SelectedExpander, Mode=TwoWay, Converter={StaticResource ExpanderToBooleanConverter}, ConverterParameter=2}">
                                 <Expander.Header>
                                     <BulletDecorator>
@@ -113,7 +113,7 @@
                                 </WrapPanel>
                             </Expander>
                         </DockPanel>
-                        <DockPanel Margin="0,0,0,0" x:Name="exitDock">
+                        <DockPanel  x:Name="exitDock">
                             <Expander  IsExpanded="{Binding SelectedExpander, Mode=TwoWay, Converter={StaticResource ExpanderToBooleanConverter}, ConverterParameter=4}">
                                 <Expander.Header>
                                     <BulletDecorator>
@@ -199,6 +199,6 @@
         </Border>
         <Image x:Name="exclamImage" Source="exclamIcon.png" Height="20"  Width="20" HorizontalAlignment="Right" Margin="0,-320,0,0"/>
         <Label x:Name="currentUserLabel" Content="User" Margin="800,40,0,155" FontWeight="Bold"/>
-        <Frame x:Name="LoginFrame" HorizontalAlignment="Left" Height="337" VerticalAlignment="Top" Width="880" NavigationUIVisibility="Hidden" Margin="0,0,-8,0" />
+        <Frame x:Name="LoginFrame" HorizontalAlignment="Left" Height="337" VerticalAlignment="Top" Width="880" NavigationUIVisibility="Hidden" />
     </Grid>
 </Window>
