@@ -278,7 +278,7 @@ namespace WpfApp1
             }
             public void Execute(object parameter)
             {
-                if (specifiedImport.newBankTextbox.Text.ToString() != "")
+                if (specifiedImport.storedTypesCB.SelectedItem.ToString()!="Add new Bank" || specifiedImport.newBankTextbox.Text.ToString() != "")
                 {
                     List<string> currentFile = new List<string>();
                     currentFile.Add(currentFileName);
@@ -321,7 +321,8 @@ namespace WpfApp1
                         string accountNumber = record["AccountNumberPos"].ToString();
                         if (accountNumber != "Sheet name")
                         {
-                            long size = sizeof(char) * accountNumber.Length;
+                            long size;
+                            size = accountNumber.Length;
                             if (size > 1)
                             {
                                 accountNumberChoice = "Cell";
